@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDGSQLQuery_SQLExecuteParamContract</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[DataContractAttribute]
+internal final class HDGSQLQuery_SQLExecuteParamContract
+{
+    private str SQLText;
+    private int MaxRows;
+    private HDGSQLQuery_SQLExecuteMode QueryExecuteMode;
+    private str Filename;
+    private HDGSQLQuery_SQLExecuteOutputType OutputType;
+    private str FormatParameters;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>SQLText</Name>
+				<Source><![CDATA[
+    [DataMember("SQLText")]
+    public str SQLText(str _value = SQLText)
+    {
+        SQLText = _value;
+        return SQLText;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>MaxRows</Name>
+				<Source><![CDATA[
+    [DataMember("MaxRows")]
+    public int MaxRows(int _value = MaxRows)
+    {
+        MaxRows = _value;
+        return MaxRows;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>QueryExecuteMode</Name>
+				<Source><![CDATA[
+    [DataMember("QueryExecuteMode")]
+    public HDGSQLQuery_SQLExecuteMode QueryExecuteMode(HDGSQLQuery_SQLExecuteMode _value = QueryExecuteMode)
+    {
+        QueryExecuteMode = _value;
+        return QueryExecuteMode;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>Filename</Name>
+				<Source><![CDATA[
+    [DataMember("Filename")]
+    public str Filename(str _value = Filename)
+    {
+        Filename = _value;
+        return Filename;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>OutputType</Name>
+				<Source><![CDATA[
+    [DataMember("Filename")]
+    public HDGSQLQuery_SQLExecuteOutputType OutputType(HDGSQLQuery_SQLExecuteOutputType _value = OutputType)
+    {
+        OutputType = _value;
+        return OutputType;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>FormatParameters</Name>
+				<Source><![CDATA[
+    [DataMember("Filename")]
+    public str FormatParameters(str _value = FormatParameters)
+    {
+        FormatParameters = _value;
+        return FormatParameters;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

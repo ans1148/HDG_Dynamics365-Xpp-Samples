@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDGSQLQuery_SQLExecuteHelper</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class HDGSQLQuery_SQLExecuteHelper
+{
+    HDGSQLQuery_SQLExecuteParamContract sqlExecuteParam;
+    HDGSQLQuery_SQLExcelWriterHelper    fileWriterExcel;
+
+    HDGSQLQuery_SQLExecuteLog           queryExecuteLog;
+
+    TextBuffer                          textBuffer;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>construct</Name>
+				<Source><![CDATA[
+    public static HDGSQLQuery_SQLExecuteHelper construct(str _sqlText
+                            , int _maxRows
+                            , HDGSQLQuery_SQLExecuteMode _queryExecuteMode
+                            , str _fileName
+                            , HDGSQLQuery_SQLExecuteOutputType _outputType
+                            , str _formatParamters)
+    {
+        HDGSQLQuery_SQLExecuteHelper queryHelper = new HDGSQLQuery_SQLExecuteHelper();
+        
+        HDGSQLQuery_SQLExecuteParamContract localContract = new HDGSQLQuery_SQLExecuteParamContract();
+        localContract.SQLText(_sqlText);
+        localContract.MaxRows(_maxRows);
+        localContract.QueryExecuteMode(_queryExecuteMode);
+        localContract.Filename(_fileName);
+        localContract.OutputType(_outputType);
+        localContract.FormatParameters(_formatParamters);
+
+        queryHelper.parmSQLExecuteParam(localContract);
+
+        return queryHelper;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmSQLExecuteParam</Name>
+				<Source><![CDATA[
+    public HDGSQLQuery_SQLExecuteParamContract parmSQLExecuteParam(HDGSQLQuery_SQLExecuteParamContract _contract)
+    {
+        sqlExecuteParam = new HDGSQLQuery_SQLExecuteParamContract();
+        sqlExecuteParam = _contract;
+
+        return sqlExecuteParam;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>logBegin</Name>
+				<Source><![CDATA[
+    void logBegin()
+    {
+        ttsbegin;
+
+        queryExecuteLog.clear();
+        queryExecuteLog.SQLText = sqlExecuteParam.SQLText();
+        queryExecuteLog.StartDateTime = DateTimeUtil::getSystemDateTime();
+        queryExecuteLog.QueryExecuteMode = sqlExecuteParam.QueryExecuteMode();
+        queryExecuteLog.EndDateTime = utcDateTimeNull();
+        queryExecuteLog.FormatParameters = sqlExecuteParam.FormatParameters();
+        queryExecuteLog.insert();
+
+        ttscommit;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>logEnd</Name>
+				<Source><![CDATA[
+    void logEnd()
+    {
+        ttsbegin;
+        queryExecuteLog = HDGSQLQuery_SQLExecuteLog::find(queryExecuteLog.RecId, true);
+        queryExecuteLog.EndDateTime = DateTimeUtil::getSystemDateTime();
+        queryExecuteLog.Duration = any2Int(DateTimeUtil::getDifference(queryExecuteLog.EndDateTime, queryExecuteLog.StartDateTime));
+        queryExecuteLog.update();
+        ttscommit;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>executeSQL</Name>
+				<Source><![CDATA[
+    public str executeSQL()
+    {
+        str returnHtml;
+        textBuffer = new TextBuffer();
+
+        this.logBegin();
+
+        switch(sqlExecuteParam.QueryExecuteMode())
+        {
+            case HDGSQLQuery_SQLExecuteMode::Select:
+                
+                if(sqlExecuteParam.OutputType() != HDGSQLQuery_SQLExecuteOutputType::Excel)
+                {
+                    this.doSelectQuery();
+                    returnHtml = '<!DOCTYPE html>\n <html><body><table>' + textBuffer.getText() + '</table></body></html>';
+
+                    if (sqlExecuteParam.OutputType() == HDGSQLQuery_SQLExecuteOutputType::HTML)
+                    {
+                        File::SendStringAsFileToUser(returnHtml, strFmt('%1.html', sqlExecuteParam.Filename()));
+                    }
+                }
+                else
+                {
+                    fileWriterExcel = new HDGSQLQuery_SQLExcelWriterHelper();
+                    fileWriterExcel.parmWorkSheetNameStr(sqlExecuteParam.Filename());
+                    this.doSelectQueryExcel();
+
+                    fileWriterExcel.createExcelDocument();
+                    fileWriterExcel.doExcelOutput('A1');
+                    fileWriterExcel.excelMarkAsBorderAll();
+
+                    fileWriterExcel.finishOutput();
+                }
+
+                break;
+
+            case HDGSQLQuery_SQLExecuteMode::Update:
+
+                this.executeUpdateQuery(sqlExecuteParam.SQLText());
+                returnHtml = strFmt('Executed %1, %2',
+                    DateTimeUtil::applyTimeZoneOffset(DateTimeUtil::getSystemDateTime(), DateTimeUtil::getUserPreferredTimeZone()),
+                    curUserId());
+
+                break;
+        }
+
+        this.logEnd();
+        
+        return returnHtml;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>executeSelectQuery</Name>
+				<Source><![CDATA[
+    private ResultSet executeSelectQuery(str _strQuery)
+    {
+        Connection  connection = new Connection();
+        Statement   statement = connection.createStatement();
+        SqlStatementExecutePermission permission;
+        ResultSet resultSet;
+           
+        permission = new SqlStatementExecutePermission(_strQuery);
+        permission.assert();
+
+        Map paramMap = SqlParams::create();
+        resultSet = statement.executeQueryWithParameters(_strQuery, paramMap);
+
+        return resultSet;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>executeUpdateQuery</Name>
+				<Source><![CDATA[
+    public void executeUpdateQuery(str _strQuery)
+    {
+        Connection  connection = new Connection();
+        Statement   statement = connection.createStatement();
+        SqlStatementExecutePermission permission;
+                     
+        permission = new SqlStatementExecutePermission(_strQuery);
+        permission.assert();
+
+        Map paramMap = SqlParams::create();
+        statement.executeUpdateWithParameters(_strQuery, paramMap);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>doSelectQuery</Name>
+				<Source><![CDATA[
+    public void doSelectQuery()
+    {
+        int         i;
+        ResultSet   resultSet;
+        ResultSetMetaData  resultSetMetaData;
+        int         maxColumnCount;
+        int         currentRow;
+
+        resultSet = this.executeSelectQuery(sqlExecuteParam.SQLText());
+        resultSetMetaData = resultSet.getMetaData();
+
+        while(resultSet.next())
+        {
+            currentRow++;
+            if (currentRow > sqlExecuteParam.MaxRows())
+            {
+                warning(strFmt("Exceeding the allowed number of lines %1", sqlExecuteParam.MaxRows()));
+                break;
+            }
+            
+            // Print headers
+            if (currentRow == 1)
+            {
+                textBuffer.appendText('<tr style="border: 1px  solid gray; padding: 1px;">');
+
+                for ( i = 1; i <= resultSetMetaData.getColumnCount(); i++)
+                {
+                    textBuffer.appendText(strFmt('<th style="border: 1px  solid gray; padding: 1px;">%1</th>', resultSetMetaData.getColumnName(i)));
+                }
+
+                textBuffer.appendText('</tr>');
+
+                maxColumnCount = resultSetMetaData.getColumnCount();
+            }
+
+            // Print body data
+            textBuffer.appendText('<tr style="border: 1px  solid gray; padding: 1px;">');
+            for ( i = 1; i <= maxColumnCount; i++)
+            {
+                str valueStr = resultSet.getString(i);
+
+                textBuffer.appendText(strFmt('<td style="border: 1px  solid gray; padding: 1px;">%1</td>', valueStr));
+            }
+            textBuffer.appendText('</tr>');
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>doSelectQueryExcel</Name>
+				<Source><![CDATA[
+    public void doSelectQueryExcel()
+    {
+        int         i, j;
+        container   expectedSubResult;
+        ResultSet   resultSet;
+        ResultSetMetaData  resultSetMetaData;
+        int         maxColumnCount;
+        int         currentRow;
+        Map         columnTypesMap = new Map(Types::Integer, Types::Integer);
+        Map         enumTypesMap = new Map(Types::String, Types::String);
+        Set         enumColumnSet = new Set(Types::Integer);
+        Set         dateTimeColumnSet = new Set(Types::Integer);
+        Set         dateColumnSet = new Set(Types::Integer);
+        container   tableNamesCon;
+        int curTab;
+        ;
+
+        if (sqlExecuteParam.FormatParameters())
+        {
+            tableNamesCon = str2con_RU(strReplace(sqlExecuteParam.FormatParameters(), ' ', ''), ',');
+        }
+        resultSet = this.executeSelectQuery(sqlExecuteParam.SQLText());
+        resultSetMetaData = resultSet.getMetaData();
+
+        while(resultSet.next())
+        {
+            currentRow++;
+            if (currentRow > sqlExecuteParam.MaxRows())
+            {
+                warning(strFmt("Exceeding the allowed number of lines %1", sqlExecuteParam.MaxRows()));
+                break;
+            }
+            // Print headers
+            if (currentRow == 1)
+            {
+                expectedSubResult = connull();
+                for ( i = 1; i <= resultSetMetaData.getColumnCount(); i++)
+                {
+                    str  columnName = resultSetMetaData.getColumnName(i);
+                    expectedSubResult += columnName;
+
+                    DictTable   dictTable;
+                    DictField   dictField;
+                    DictEnum    dictEnum;
+                    for(curTab = 1; curTab <= conLen(tableNamesCon); curTab++)
+                    {
+                        dictTable = new DictTable(tableName2Id(conPeek(tableNamesCon, curTab)));
+                        if (dictTable)
+                        {
+                            FieldId  fieldId = dictTable.fieldName2Id(columnName);
+                            if (fieldId)
+                            {
+                                dictField = dictTable.fieldObject(fieldId);
+                                if (dictField.baseType() == Types::Enum && dictField.enumId())
+                                {
+                                    enumColumnSet.add(i);
+                                    dictEnum = new DictEnum(dictField.enumId());
+                                    for (j = 0; j < dictEnum.values(); j++) 
+                                    {
+                                        enumTypesMap.insert(strFmt('%1:%2',i, dictEnum.index2Value(j)),  dictEnum.index2Label(j));
+                                    }
+                                    info(strFmt("Enum transformation %1.%2 is applied to %3(%4) field",
+                                        dictTable.name(), dictField.name(), columnName, i));
+                                }
+                                if (dictField.baseType() == Types::UtcDateTime)
+                                {
+                                    dateTimeColumnSet.add(i);
+                                    info(strFmt("DateTime transformation %1.%2 is applied to %3(%4) field",
+                                        dictTable.name(), dictField.name(), columnName, i));
+                                }
+                                if (dictField.baseType() == Types::Date)
+                                {
+                                    dateColumnSet.add(i);
+                                }
+                            }
+                        }
+                    }
+
+                    columnTypesMap.insert(i, resultSetMetaData.getColumnType(i));
+                }
+                
+                fileWriterExcel.addContainerLine(expectedSubResult);
+                fileWriterExcel.markRowAsBold();
+                
+                maxColumnCount = resultSetMetaData.getColumnCount();
+            }
+
+            // Print body data
+            expectedSubResult = connull();
+            str     sTmp;
+            for ( i = 1; i <= maxColumnCount; i++)
+            {
+                Types t = columnTypesMap.lookup(i);
+                switch (t)
+                {
+                    case Types::Real:
+                        real realTmp = resultSet.getReal(i);
+                        expectedSubResult += realTmp;
+                        break;
+                    case Types::Integer:
+                        int intTmp = resultSet.getInt(i);
+                        if (enumColumnSet.in(i))
+                        {
+                            if (enumTypesMap.exists(strFmt('%1:%2',i, intTmp)))
+                            {
+                                sTmp = enumTypesMap.lookup(strFmt('%1:%2',i, intTmp));
+                            }
+                            else
+                            {
+                                sTmp = strFmt('%1', intTmp);
+                            }
+                            expectedSubResult += sTmp;
+                        }
+                        else
+                        {
+                            expectedSubResult += intTmp;
+                        }
+
+                        break;
+                    case Types::Date:
+                        if (dateTimeColumnSet.in(i))
+                        {
+                            TransDateTime  tdt = resultSet.getDateTime(i);
+                            if (tdt != utcDateTimeNull())
+                            {
+                                tdt = DateTimeUtil::applyTimeZoneOffset(tdt, DateTimeUtil::getUserPreferredTimeZone());
+                            }
+                            expectedSubResult += tdt;
+                        }
+                        else
+                        {
+                            if (dateColumnSet.in(i))
+                            {
+                                TransDate td = resultSet.getDate(i);
+                                expectedSubResult += td;
+                            }
+                            else
+                            {
+                                sTmp = resultSet.getString(i);
+                                expectedSubResult += sTmp;
+                            }
+                        }
+                        break;
+                    default:
+                        sTmp = resultSet.getString(i);
+                        expectedSubResult += sTmp;
+                }
+                
+            }
+
+            fileWriterExcel.addContainerLine(expectedSubResult);
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
