@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxForm xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V6">
+	<Name>HDGEmail_EmailWirteForm</Name>
+	<SourceCode>
+		<Methods xmlns="">
+			<Method>
+				<Name>classDeclaration</Name>
+				<Source><![CDATA[
+[Form]
+public class HDGEmail_EmailWirteForm extends FormRun
+{
+}
+]]></Source>
+			</Method>
+			<Method>
+				<Name>init</Name>
+				<Source><![CDATA[
+    public void init()
+    {
+        super();
+
+        FromEmail.text(SysUserInfo::getUserEmail(curUserId()));
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+		<DataSources xmlns="" />
+		<DataControls xmlns="">
+			<Control>
+				<Name>SendButton</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        public void clicked()
+        {
+            super();
+
+            var messageBuilder = new SysMailerMessageBuilder();
+            messageBuilder.setFrom(FromEmail.valueStr()) // From is optional
+                .addTo(ToEmail.valueStr())
+                .addCc(CcEmail.valueStr())
+                .setSubject(SubjectEmail.valueStr())
+                .setBody(BodyEmail.parmHtmlContent());
+            SysMailerFactory::sendNonInteractive(messageBuilder.getMessage());
+
+            Info('Email is send successfully!');
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+			<Control>
+				<Name>SendButton_Multi</Name>
+				<Type>Button</Type>
+				<Methods>
+					<Method>
+						<Name>clicked</Name>
+						<Source><![CDATA[
+        public void clicked()
+        {
+            int i;
+            str toEamilStr;
+
+            super();
+
+            container toEamilContainer = str2con(ToEmail.valueStr(), ';');
+            var messageBuilder = new SysMailerMessageBuilder();
+
+            for (i = 1; i <= conLen(toEamilContainer); i++)
+            {
+                toEamilStr = conPeek(toEamilContainer, i);
+
+                if(toEamilStr)
+                {
+                    messageBuilder.reset()
+                        .setFrom(FromEmail.valueStr()) // From is optional
+                        .addTo(toEamilStr)
+                        .addCc(CcEmail.valueStr())
+                        .setSubject(SubjectEmail.valueStr())
+                        .setBody(BodyEmail.parmHtmlContent());
+                    SysMailerFactory::sendNonInteractive(messageBuilder.getMessage());
+                }
+            }
+
+            Info('Email is send successfully!');
+        }
+
+]]></Source>
+					</Method>
+				</Methods>
+			</Control>
+		</DataControls>
+		<Members xmlns="" />
+	</SourceCode>
+	<DataSources />
+	<Design>
+		<Pattern xmlns="">Custom</Pattern>
+		<ShowDeleteButton xmlns="">No</ShowDeleteButton>
+		<ShowNewButton xmlns="">No</ShowNewButton>
+		<ViewEditMode xmlns="">Edit</ViewEditMode>
+		<Controls xmlns="">
+			<AxFormControl xmlns=""
+				i:type="AxFormActionPaneControl">
+				<Name>ActionPane</Name>
+				<Type>ActionPane</Type>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormButtonGroupControl">
+						<Name>ButtonGroup</Name>
+						<Type>ButtonGroup</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Controls>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonControl">
+								<Name>SendButton</Name>
+								<Type>Button</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<NormalImage>Send</NormalImage>
+								<Text>Send</Text>
+							</AxFormControl>
+							<AxFormControl xmlns=""
+								i:type="AxFormButtonControl">
+								<Name>SendButton_Multi</Name>
+								<Type>Button</Type>
+								<FormControlExtension
+									i:nil="true" />
+								<NormalImage>Send</NormalImage>
+								<Text>Send multi</Text>
+							</AxFormControl>
+						</Controls>
+					</AxFormControl>
+				</Controls>
+			</AxFormControl>
+			<AxFormControl xmlns=""
+				i:type="AxFormGroupControl">
+				<Name>ContentGroup</Name>
+				<Type>Group</Type>
+				<WidthMode>SizeToAvailable</WidthMode>
+				<FormControlExtension
+					i:nil="true" />
+				<Controls>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>FromEmail</Name>
+						<AllowEdit>No</AllowEdit>
+						<AutoDeclaration>Yes</AutoDeclaration>
+						<Type>String</Type>
+						<WidthMode>SizeToAvailable</WidthMode>
+						<FormControlExtension
+							i:nil="true" />
+						<Label>From</Label>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>ToEmail</Name>
+						<AutoDeclaration>Yes</AutoDeclaration>
+						<Type>String</Type>
+						<WidthMode>SizeToAvailable</WidthMode>
+						<FormControlExtension
+							i:nil="true" />
+						<Label>To</Label>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>CcEmail</Name>
+						<AutoDeclaration>Yes</AutoDeclaration>
+						<Type>String</Type>
+						<WidthMode>SizeToAvailable</WidthMode>
+						<FormControlExtension
+							i:nil="true" />
+						<Label>CC</Label>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStringControl">
+						<Name>SubjectEmail</Name>
+						<AutoDeclaration>Yes</AutoDeclaration>
+						<Type>String</Type>
+						<WidthMode>SizeToAvailable</WidthMode>
+						<FormControlExtension
+							i:nil="true" />
+						<Label>Subject</Label>
+					</AxFormControl>
+					<AxFormControl xmlns=""
+						i:type="AxFormStaticTextControl">
+						<Name>BodyLabel</Name>
+						<Type>StaticText</Type>
+						<FormControlExtension
+							i:nil="true" />
+						<Text>Body</Text>
+					</AxFormControl>
+					<AxFormControl>
+						<Name>BodyEmail</Name>
+						<AutoDeclaration>Yes</AutoDeclaration>
+						<HeightMode>SizeToAvailable</HeightMode>
+						<WidthMode>SizeToAvailable</WidthMode>
+						<FormControlExtension>
+							<Name>HTMLEditor</Name>
+							<ExtensionComponents />
+							<ExtensionProperties>
+								<AxFormControlExtensionProperty>
+									<Name>parmDataSourceName</Name>
+									<Type>String</Type>
+								</AxFormControlExtensionProperty>
+								<AxFormControlExtensionProperty>
+									<Name>parmDataFieldName</Name>
+									<Type>String</Type>
+								</AxFormControlExtensionProperty>
+								<AxFormControlExtensionProperty>
+									<Name>parmDataMethodName</Name>
+									<Type>String</Type>
+								</AxFormControlExtensionProperty>
+							</ExtensionProperties>
+						</FormControlExtension>
+					</AxFormControl>
+				</Controls>
+			</AxFormControl>
+		</Controls>
+	</Design>
+	<Parts />
+</AxForm>

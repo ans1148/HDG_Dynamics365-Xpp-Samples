@@ -16,3 +16,11 @@ I have refactored the code in the above reference link. Also, I add the some fun
 Please refer "Report_Send_Email" folder.
 
 ![Send Email as attachment](img/ReportSendEmailSample.png)
+
+# Send an email
+
+Please refer "Send_Email" folder.
+
+Document : [Microsoft document](https://learn.microsoft.com/en-us/dynamics365/fin-ops-core/dev-itpro/dev-tools/sysmailer-develop?context=%2Fdynamics365%2Fcontext%2Fcommerce#sending-emails) 
+
+![Send Email](img/SendEmailSample.png)
