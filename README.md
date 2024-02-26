@@ -10,3 +10,9 @@ Refer : [XppTools Git](https://github.com/TrudAX/XppTools/tree/master/DEVTools/D
 I have refactored the code in the above reference link. Also, I add the some functions that if update mode is selected then enabling only screen output.
 
 ![Execute direct SQL](img/ExecuteDirectQuerySample.png)
+
+# Send an email to the SSRS report as an attachment
+
+Please refer "Report_Send_Email" folder.
+
+![Send Email as attachment](img/ReportSendEmailSample.png)

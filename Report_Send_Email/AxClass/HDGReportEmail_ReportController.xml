@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDGReportEmail_ReportController</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class HDGReportEmail_ReportController extends SrsReportRunController
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args _args)
+    {
+        HDGReportEmail_ReportController controller = new HDGReportEmail_ReportController();
+
+        controller.parmReportName(ssrsReportStr(EntAssetRequestList, List));
+        controller.parmArgs(_args);
+        controller.parmShowDialog(false);
+        controller.startOperation();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>prePromptModifyContract</Name>
+				<Source><![CDATA[
+    protected void prePromptModifyContract()
+    {
+        SRSPrintDestinationSettings printSettings;
+        SrsReportEMailDataContract emailContract;
+
+        // Create email contract
+        emailContract = new SrsReportEMailDataContract();
+
+        // Fill in the email contract details
+        emailContract.parmAttachmentFileFormat(SRSReportFileFormat::PDF);
+        emailContract.parmSubject('Insert the subject here');
+        emailContract.parmTo(SysUserInfo::getUserEmail(curUserId()));
+
+        // Get print settings from contract
+        printSettings = this.parmReportContract().parmPrintSettings();
+
+        // Update print settings with email contract and use pdf format in the attachment
+        printSettings.printMediumType(SRSPrintMediumType::Email);
+        printSettings.parmEMailContract(emailContract);
+        printSettings.fileFormat(SRSReportFileFormat::PDF);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

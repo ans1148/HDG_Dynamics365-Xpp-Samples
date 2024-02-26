@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxMenuExtension xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns="Microsoft.Dynamics.AX.Metadata.V1">
+	<Name>EntAsset.HDGReportEmail</Name>
+	<Customizations />
+	<Elements>
+		<AxMenuExtensionElement xmlns="">
+			<Parent>RequestsReports</Parent>
+			<PositionType>AfterItem</PositionType>
+			<PreviousSibling>EntAssetRequestReportList</PreviousSibling>
+			<MenuElement xmlns=""
+				i:type="AxMenuElementMenuItem">
+				<Name>HDGReportEmail_ReportController</Name>
+				<MenuItemName>HDGReportEmail_ReportController</MenuItemName>
+				<MenuItemType>Output</MenuItemType>
+			</MenuElement>
+		</AxMenuExtensionElement>
+	</Elements>
+	<MenuElementModifications />
+	<PropertyModifications />
+</AxMenuExtension>
