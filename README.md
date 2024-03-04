@@ -24,3 +24,21 @@ Please refer "Send_Email" folder.
 Document : [Microsoft document](https://learn.microsoft.com/en-us/dynamics365/fin-ops-core/dev-itpro/dev-tools/sysmailer-develop?context=%2Fdynamics365%2Fcontext%2Fcommerce#sending-emails) 
 
 ![Send Email](img/SendEmailSample.png)
+
+# Message API
+
+Various Message API practice codes.
+
+Document : [Microsoft document](https://learn.microsoft.com/en-us/dynamics365/fin-ops-core/dev-itpro/user-interface/messaging-api-center-bar-details)
+
+## Add action on message / Set prefix
+
+Refer HDGMessage_MessagingAPI::addPrefix(); / HDGMessage_MessagingAPI::addAction();
+
+![MessageAPI_1](img/MessageAPI_1.png)
+
+## Add message to action center
+
+Refer HDGMessage_MessagingAPI::addActionCenter();
+
+![MessageAPI_2](img/MessageAPI_2.png)

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDGMessage_MessagingAPI</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class HDGMessage_MessagingAPI
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args _args)
+    {
+        HDGMessage_MessagingAPI::addPrefix();
+        HDGMessage_MessagingAPI::addAction();
+        HDGMessage_MessagingAPI::addActionCenter();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>addAction</Name>
+				<Source><![CDATA[
+    static void addAction()
+    {
+        MenuItemMessageAction actionData = new MenuItemMessageAction();
+        actionData.MenuItemName(menuItemDisplayStr('BatchJob'));
+        str jsonData = FormJsonSerializer::serializeClass(actionData);
+
+        int64 messageInfoId = Message::AddAction(MessageSeverity::Informational
+                                            , 'Information message'
+                                            , 'Action message(Link)'
+                                            , MessageActionType::DisplayMenuItem // ActionMenuItem, DisplayMenuItem
+                                            , jsonData);
+
+        int64 messageWarningId = Message::AddAction(MessageSeverity::Warning
+                                            , 'Warning message'
+                                            , 'Action message(Link)'
+                                            , MessageActionType::DisplayMenuItem // ActionMenuItem, DisplayMenuItem
+                                            , jsonData);
+
+        int64 messageInfoErrorId = Message::AddAction(MessageSeverity::Error
+                                            , 'Error message'
+                                            , 'Action message(Link)'
+                                            , MessageActionType::DisplayMenuItem // ActionMenuItem, DisplayMenuItem
+                                            , jsonData);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>addPrefix</Name>
+				<Source><![CDATA[
+    static void addPrefix()
+    {
+        // The first call of SetPrefix is root message on this scope
+        setPrefix('**** Main header ****');
+
+        // Level1 prefix
+        setPrefix('Level1 A');
+        Info('Level2 a');
+        Info('Level2 b');
+
+        // Level2 prefix
+        setPrefix('Level1 B');
+        warning('Level2 c');
+        Error('Level2 d');
+
+        setPrefix('Level2 e');
+        Error('Level3 aa');
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>addActionCenter</Name>
+				<Source><![CDATA[
+    static void addActionCenter()
+    {
+        // Set up the notification
+        SystemNotificationDataContract notification = new SystemNotificationDataContract();
+        notification.Users().value(1, curUserId()); // Set who wants to receive message
+        notification.Title("Customer US-003 view");
+        notification.RuleId('RuleId');
+        notification.Message("Let's see US-003 customer information.");
+        notification.ExpirationDateTime(DateTimeUtil::addHours(DateTimeUtil::utcNow(), 48)); // Expiration time is 48 hours
+
+        // Set up the action associated with the notification
+        SystemNotificationActionDataContract action = new SystemNotificationActionDataContract();
+        action.Message("Click to go");
+        action.Type(SystemNotificationActionType::AxDisplayMenuFunction);
+
+        SystemNotificationMenuFunctionDataContract actionData = new SystemNotificationMenuFunctionDataContract();
+        actionData.MenuItemName(menuItemDisplayStr(CustTableListPage));
+        actionData.TableName(tableStr(CustTable));
+        actionData.RecId(CustTable::find('US-003').RecId);
+        action.Data(FormJsonSerializer::serializeClass(actionData));
+        notification.Actions().value(1, action);
+
+        SystemNotificationsManager::AddSystemNotification(notification);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
