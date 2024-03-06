@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDGPurchReceipt_PurchReceiptPartialContract</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[DataContractAttribute]
+internal final class HDGPurchReceipt_PurchReceiptPartialContract
+{
+    private PurchId purchId;
+    private TradeLineNumber lineNumber;
+    private TransDate transDate;
+    private Num num;
+    private PurchQty receiveQty;
+    private boolean register;
+    private InventSiteId inventSiteId;
+    private InventLocationId inventLocationId;
+    private WMSLocationId wMSLocationId;
+
+}
+
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>PurchId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("PurchId")]
+    public PurchId PurchId(PurchId _purchId = purchId)
+    {
+        purchId = _purchId;
+        return purchId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>LineNumber</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("LineNumber")]
+    public TradeLineNumber LineNumber(TradeLineNumber _lineNumber = lineNumber)
+    {
+        lineNumber = _lineNumber;
+        return lineNumber;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>TransDate</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("TransDate")]
+    public TransDate TransDate(TransDate _transDate = transDate)
+    {
+        transDate = _transDate;
+        return transDate;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>Num</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("Num")]
+    public Num Num(Num _num = num)
+    {
+        num = _num;
+        return num;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ReceiveQty</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("ReceiveQty")]
+    public PurchQty ReceiveQty(PurchQty _receiveQty = receiveQty)
+    {
+        receiveQty = _receiveQty;
+        return receiveQty;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>Register</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute('Register')]
+    public boolean Register(boolean _register = register)
+    {
+        register = _register;
+        return register;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>InventSiteId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute('InventSiteId')]
+    public InventSiteId InventSiteId(InventSiteId _inventSiteId = inventSiteId)
+    {
+        inventSiteId = _inventSiteId;
+        return inventSiteId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>InventLocationId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute('InventLocationId')]
+    public InventLocationId InventLocationId(InventLocationId _inventLocationId = inventLocationId)
+    {
+        inventLocationId = _inventLocationId;
+        return inventLocationId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>wMSLocationId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute('wMSLocationId')]
+    public WMSLocationId wMSLocationId(WMSLocationId _wMSLocationId = wMSLocationId)
+    {
+        wMSLocationId = _wMSLocationId;
+        return wMSLocationId;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

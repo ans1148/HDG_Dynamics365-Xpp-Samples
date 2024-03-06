@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDGPurchReceipt_PruchReceiptHelper</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class HDGPurchReceipt_PruchReceiptHelper
+{
+}
+
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>purchReceiptOnePO</Name>
+				<Source><![CDATA[
+    public void purchReceiptOnePO(PurchId _purchId, Num _packingSlipId)
+    {
+        PurchTable purchTable;
+
+        purchTable = PurchTable::find(_purchId);
+
+        PurchFormLetter                  purchFormLetter;
+        
+        purchFormLetter = purchFormLetter::construct(DocumentStatus::PackingSlip);
+        purchFormLetter.showQueryForm(false);
+        purchFormLetter.update(purchTable,
+                _packingSlipId,
+                purchTable.AccountingDate,
+                PurchUpdate::All,
+                AccountOrder::None,
+                false,
+                false);
+
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>purchReceiptUsingQuery</Name>
+				<Source><![CDATA[
+    public void purchReceiptUsingQuery(container _purchIdCon)
+    {
+        Query               query;
+        SysQueryRun         queryRun;
+        PurchFormLetter     purchFormLetter;
+        PurchTable          purchTable;
+        int                 i;
+
+        // Set query
+        query = new Query(queryStr(PurchUpdate));
+
+        // Select purchase order
+        for(i = 1 ; i <= conLen(_purchIdCon) ; i++)
+        {
+            query.dataSourceTable(tableNum(PurchTable)).addRange(fieldNum(PurchTable, PurchId)).value(conPeek(_purchIdCon, i));
+        }
+        queryRun = new SysQueryRun(query);
+
+        // Post purchase receipt
+        purchFormLetter = PurchFormLetter::construct(DocumentStatus::PackingSlip);
+        purchFormLetter.chooseLinesQuery(queryRun);
+        purchFormLetter.chooseLines();
+        purchFormLetter.createParmUpdateFromParmUpdateRecord(purchFormLetter.purchParmUpdate());
+
+        if(purchFormLetter.prompt())
+        {
+            purchFormLetter.run();
+        }
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDGPurchReceipt_MainTest</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class HDGPurchReceipt_MainTest
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args _args)
+    {
+        HDGPurchReceipt_PurchReceiptPartialContract contract;
+        List purchReceiptList = new List(Types::Class);
+
+        PurchLine purchLine;
+
+        while select purchLine
+            where purchLine.PurchId == '000015'
+        {
+            contract = new HDGPurchReceipt_PurchReceiptPartialContract();
+
+            contract.PurchId(purchLine.PurchId);
+            contract.LineNumber(purchLine.LineNumber);
+            contract.Num('PuckingListId001');
+            contract.ReceiveQty(purchLine.QtyOrdered / 2);
+            contract.Register(true);
+
+            InventDim inventDim = InventDim::find(purchLine.InventDimId);
+
+            contract.InventSiteId(inventDim.InventSiteId);
+            contract.InventLocationId(inventDim.InventLocationId);
+            contract.wMSLocationId(inventDim.wMSLocationId);
+
+            purchReceiptList.addEnd(contract);
+        }
+
+        HDGPurchReceipt_PurchReceiptPartialHelper purchReceiptPartialHelper = new HDGPurchReceipt_PurchReceiptPartialHelper();
+
+        purchReceiptPartialHelper.parmPurchReceiptList(purchReceiptList);
+        purchReceiptPartialHelper.run();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDGPurchReceipt_PurchReceiptPartialHelper</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class HDGPurchReceipt_PurchReceiptPartialHelper
+{
+    PurchParmUpdate                  purchParmUpdate;
+
+    private List gList;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>parmPurchReceiptList</Name>
+				<Source><![CDATA[
+    public List parmPurchReceiptList(List _list)
+    {
+        gList = _list;
+        return gList;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>run</Name>
+				<Source><![CDATA[
+    public void run()
+    {
+        HDGPurchReceipt_PurchReceiptPartialContract contract;
+
+        PurchFormLetterParmData          purchFormLetterParmData;
+        PurchParmTable                   purchParmTable, purchParmTableDuplicate;
+        PurchParmLine                    purchParmLine;
+        
+        
+        ListEnumerator listEnumerator = gList.getEnumerator();
+
+        ttsbegin;
+
+        purchFormLetterParmData = PurchFormletterParmData::newData(DocumentStatus::PackingSlip, VersioningUpdateType::Initial);
+
+        purchFormLetterParmData.parmOnlyCreateParmUpdate(true);
+        purchFormLetterParmData.createData(false);
+        purchParmUpdate = purchFormLetterParmData.parmParmUpdate();
+
+        while(listEnumerator.moveNext())
+        {
+            contract = listEnumerator.current();
+
+            PurchLine purchLine = PurchLine::find(contract.PurchId(), contract.LineNumber());
+
+            // Validate
+            if(!purchLine)
+            {
+                throw error('Purchase order information is not valid.');
+            }
+
+            // If you need register before receipt, set Register to true
+            if(contract.Register())
+            {
+                this.registerPurchLine(contract);
+            }
+
+            // Check there is already created proper parmtable
+            select firstonly TableRefId, ParmId, RecId
+                from purchParmTableDuplicate
+                where purchParmTableDuplicate.ParmId == purchParmUpdate.ParmId
+                && purchParmTableDuplicate.PurchId == contract.PurchId()
+                && purchParmTableDuplicate.TransDate == contract.TransDate();
+
+            // If no, create parmtable
+            if(!purchParmTableDuplicate)
+            {
+                PurchTable purchTable = PurchTable::find(contract.PurchId());
+
+                purchParmTable.clear();
+
+                purchParmTable.TransDate                = contract.TransDate();
+                purchParmTable.Ordering                 = DocumentStatus::PackingSlip;
+                purchParmTable.ParmJobStatus            = ParmJobStatus::Waiting;
+                purchParmTable.Num                      = contract.Num();
+                purchParmTable.PurchId                  = purchTable.PurchId;
+                purchParmTable.PurchName                = purchTable.PurchName;
+                purchParmTable.OrderAccount             = purchTable.OrderAccount;
+                purchParmTable.CurrencyCode             = purchTable.CurrencyCode;
+                purchParmTable.InvoiceAccount           = purchTable.InvoiceAccount;
+                purchParmTable.DeliveryName             = purchTable.DeliveryName;
+                purchParmTable.DeliveryPostalAddress    = purchTable.DeliveryPostalAddress;
+                purchParmTable.ParmId                   = purchParmUpdate.ParmId;
+
+                purchParmTable.insert();
+            }
+            // If Yes, use created parmtable
+            else
+            {
+                purchParmTable = PurchParmTable::findRecId(purchParmTableDuplicate.RecId);
+            }
+            
+            // Create parmline
+            purchParmLine.clear();
+
+            purchParmLine.initFromPurchLine(purchLine);
+
+            purchParmLine.ReceiveNow    = contract.ReceiveQty();
+            purchParmLine.ParmId        = purchParmTable.ParmId;
+            purchParmLine.TableRefId    = purchParmTable.TableRefId;
+            purchParmLine.setQty(DocumentStatus::PackingSlip, false, true);
+            purchParmLine.setLineAmount();
+            
+            if(contract.Register())
+            {
+                InventDim receivedInventDim;
+
+                receivedInventDim.InventSiteId = contract.InventSiteId();
+                receivedInventDim.InventLocationId = contract.InventLocationId();
+                receivedInventDim.wMSLocationId = contract.wMSLocationId();
+
+                purchParmLine.InventDimId = InventDim::findOrCreate(receivedInventDim).inventDimId;
+            }
+
+            purchParmLine.insert();
+        }
+
+        // Post purchase receipt
+        this.postPurchReceipt();
+
+        ttscommit;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>registerPurchLine</Name>
+				<Source><![CDATA[
+    private void registerPurchLine(HDGPurchReceipt_PurchReceiptPartialContract _contract)
+    {
+        PurchLine               purchLine;
+        InventTrans             inventTranslocal;
+        InventDim               inventDimlocal;
+
+        purchLine = PurchLine::find(_contract.PurchId(), _contract.LineNumber());
+
+        // Get original InventTransId, InventDim
+        inventTranslocal = InventTrans::findTransId(purchLine.InventTransId, true);
+        inventDimlocal   = inventTranslocal.inventDim();
+ 
+        // Set InventDim to InventTrans record
+        inventDimlocal.wMSLocationId    = _contract.wMSLocationId();
+        inventDimlocal.InventLocationId = _contract.InventLocationId();
+        inventDimlocal.InventSiteId     = _contract.InventSiteId();
+        inventDimlocal                  = InventDim::findOrCreate(inventDimlocal);
+        inventTranslocal.inventDimId    = inventDimlocal.inventDimId;
+
+        // Create register data
+        InventTransWMS_Register inventTransWMS_register;
+        TmpInventTransWMS       tmpInventTransWMS;
+
+        inventTransWMS_register         = inventTransWMS_register::newStandard(tmpInventTransWMS);
+
+        tmpInventTransWMS.clear();
+        tmpInventTransWMS.initFromInventTrans(inventTranslocal);
+        tmpInventTransWMS.ItemId    = inventTranslocal.ItemId;
+        tmpInventTransWMS.InventQty = _contract.ReceiveQty();
+        tmpInventTransWMS.insert();
+
+        inventTransWMS_register.writeTmpInventTransWMS(tmpInventTransWMS,
+                                                       inventTranslocal,
+                                                       inventDimlocal);
+       
+        inventTransWMS_register.updateInvent(inventTranslocal);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>postPurchReceipt</Name>
+				<Source><![CDATA[
+    private void postPurchReceipt()
+    {
+        PurchFormLetter                  purchFormLetter;
+        
+        purchFormLetter = PurchFormLetter::construct(DocumentStatus::PackingSlip);
+        purchFormLetter.transDate(DateTimeUtil::getSystemDate(DateTimeUtil::getUserPreferredTimeZone()));
+        purchFormLetter.specQty(PurchUpdate::All);
+
+        purchFormLetter.parmParmTableNum(purchParmUpdate.ParmId);
+        purchFormLetter.parmId(purchParmUpdate.ParmId);
+        purchFormLetter.purchParmUpdate(purchParmUpdate);
+        purchFormLetter.run();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
