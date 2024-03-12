@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDGPurchReceipt_PruchReceiptCorrectHelper</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class HDGPurchReceipt_PruchReceiptCorrectHelper
+{
+
+    private List gList;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>parmPurchReceiptList</Name>
+				<Source><![CDATA[
+    public List parmPurchReceiptList(List _list)
+    {
+        gList = _list;
+        return gList;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>run</Name>
+				<Source><![CDATA[
+    public void run()
+    {
+        HDGPurchReceipt_PurchReceiptPartialContract contract;
+        
+        ListEnumerator listEnumerator = gList.getEnumerator();
+
+        ttsbegin;
+
+        while(listEnumerator.moveNext())
+        {
+            VendPackingSlipJour             vendPackingSlipJour;
+            VendPackingSlipTrans            vendPackingSlipTrans;
+
+            PurchFormLetterParmData          purchFormLetterParmData;
+            PurchParmUpdate                  purchParmUpdate;
+            PurchParmTable                   purchParmTable;
+            PurchParmLine                    purchParmLine;
+
+            contract = listEnumerator.current();
+
+            purchFormLetterParmData = PurchFormletterParmData::newData(DocumentStatus::PackingSlip, VersioningUpdateType::Correction);
+
+            purchFormLetterParmData.parmOnlyCreateParmUpdate(true);
+            purchFormLetterParmData.createData(false);
+            purchParmUpdate = purchFormLetterParmData.parmParmUpdate();
+
+            select firstOnly vendPackingSlipJour
+                where vendPackingSlipJour.PurchId == contract.PurchId()
+                    && vendPackingSlipJour.PackingSlipId == contract.Num();
+
+            PurchTable purchTable = PurchTable::find(contract.PurchId());
+
+            purchParmTable.clear();
+
+            purchParmTable.TransDate                = contract.TransDate();
+            purchParmTable.Ordering                 = DocumentStatus::PackingSlip;
+            purchParmTable.ParmJobStatus            = ParmJobStatus::Waiting;
+            purchParmTable.Num                      = contract.Num();
+            purchParmTable.PurchId                  = purchTable.PurchId;
+            purchParmTable.PurchName                = purchTable.PurchName;
+            purchParmTable.OrderAccount             = purchTable.OrderAccount;
+            purchParmTable.CurrencyCode             = purchTable.CurrencyCode;
+            purchParmTable.InvoiceAccount           = purchTable.InvoiceAccount;
+            purchParmTable.DeliveryName             = purchTable.DeliveryName;
+            purchParmTable.DeliveryPostalAddress    = purchTable.DeliveryPostalAddress;
+            purchParmTable.ParmId                   = purchParmUpdate.ParmId;
+            purchParmTable.VendPackingSlipJour      = vendPackingSlipJour.RecId;
+
+            purchParmTable.insert();
+            
+            // Create parmline
+            select firstOnly vendPackingSlipTrans
+                where vendPackingSlipTrans.OrigPurchid == contract.PurchId()
+                    && vendPackingSlipTrans.PurchaseLineLineNumber == contract.LineNumber()
+                    && vendPackingSlipTrans.VendPackingSlipJour == vendPackingSlipJour.RecId;
+
+            purchParmLine.clear();
+
+            purchParmLine.initFromPurchLine(PurchLine::find(contract.PurchId(), contract.LineNumber()));
+            purchParmLine.ParmId                = purchParmTable.ParmId;
+            purchParmLine.TableRefId            = purchParmTable.TableRefId;
+
+            purchParmLine.ReceiveNow            = contract.ReceiveQty();
+            purchParmLine.modifiedReceiveNow();
+            purchParmLine.PreviousReceiveNow    = vendPackingSlipTrans.Qty;
+            purchParmLine.PreviousInventNow     = vendPackingSlipTrans.InventQty;;
+            purchParmLine.setQty(DocumentStatus::PackingSlip, false, true);
+            purchParmLine.setLineAmount();
+
+            purchParmLine.insert();
+
+            // Post purchase receipt
+            PurchFormLetter                  purchFormLetter;
+        
+            purchFormLetter = PurchFormLetter::construct(DocumentStatus::PackingSlip);
+            purchFormLetter.parmVersioningUpdateType(VersioningUpdateType::Correction);
+            purchFormLetter.transDate(DateTimeUtil::getSystemDate(DateTimeUtil::getUserPreferredTimeZone()));
+            purchFormLetter.specQty(PurchUpdate::ReceiveNow);
+
+            purchFormLetter.parmParmTableNum(purchParmUpdate.ParmId);
+            purchFormLetter.parmId(purchParmUpdate.ParmId);
+            purchFormLetter.purchParmUpdate(purchFormLetterParmData.parmParmUpdate());
+            purchFormLetter.parmCallerTable(vendPackingSlipJour);
+            purchFormLetter.run();
+        }
+
+        ttscommit;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

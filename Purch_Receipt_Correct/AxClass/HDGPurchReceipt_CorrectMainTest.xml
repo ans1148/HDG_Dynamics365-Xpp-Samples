@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
-	<Name>HDGPurchReceipt_MainTest</Name>
+	<Name>HDGPurchReceipt_CorrectMainTest</Name>
 	<SourceCode>
 		<Declaration><![CDATA[
-internal final class HDGPurchReceipt_MainTest
+internal final class HDGPurchReceipt_CorrectMainTest
 {
 }
 ]]></Declaration>
@@ -27,22 +27,15 @@ internal final class HDGPurchReceipt_MainTest
             contract.LineNumber(purchLine.LineNumber);
             contract.TransDate(DateTimeUtil::getSystemDate(DateTimeUtil::getUserPreferredTimeZone()));
             contract.Num('PuckingListId001');
-            contract.ReceiveQty(purchLine.QtyOrdered / 2);
-            contract.Register(true);
-
-            InventDim inventDim = InventDim::find(purchLine.InventDimId);
-
-            contract.InventSiteId(inventDim.InventSiteId);
-            contract.InventLocationId(inventDim.InventLocationId);
-            contract.wMSLocationId(inventDim.wMSLocationId);
+            contract.ReceiveQty(3);
 
             purchReceiptList.addEnd(contract);
         }
 
-        HDGPurchReceipt_PurchReceiptPartialHelper purchReceiptPartialHelper = new HDGPurchReceipt_PurchReceiptPartialHelper();
+        HDGPurchReceipt_PruchReceiptCorrectHelper purchReceiptCorrectHelper = new HDGPurchReceipt_PruchReceiptCorrectHelper();
 
-        purchReceiptPartialHelper.parmPurchReceiptList(purchReceiptList);
-        purchReceiptPartialHelper.run();
+        purchReceiptCorrectHelper.parmPurchReceiptList(purchReceiptList);
+        purchReceiptCorrectHelper.run();
 
         info("@SYS9265");
     }

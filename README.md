@@ -57,7 +57,7 @@ Refer HDGMessage_MessagingAPI::addActionCenter();
 
 # Purchase receipt
 
-[Purch_Receipt_MutipleWay](./Purch_Receipt_MutipleWay)
+[Purch_Receipt_MutipleWay](./Purch_Receipt_MutipleWay/AxClass)
 
 There are multiple way to purchase receipt through X++.
 
@@ -71,6 +71,16 @@ There are multiple way to purchase receipt through X++.
 - You can find this method in [HDGPurchReceipt_PurchReceiptPartialHelper](./Purch_Receipt_MutipleWay/HDGPurchReceipt_PurchReceiptPartialHelper.xml)
 
 - Also, the test code is [HDGPurchReceipt_MainTest](./Purch_Receipt_MutipleWay/HDGPurchReceipt_MainTest.xml) (This class is simply an example of how to call a function. I hope you customize it according to your situation.)
+
+## Correct purchase receipt
+
+[Correct purchase receipt code](./Purch_Receipt_Correct/AxClass)
+
+- In the example above, if you have purchased and receipt, in this example, you can see the correct purchase receipt.
+- This is very smiliar with [Purch_Receipt_MutipleWay](./Purch_Receipt_MutipleWay/AxClass).
+- Also, they use same data contract class [DataContractClass](./Purch_Receipt_MutipleWay/AxClass/HDGPurchReceipt_PurchReceiptPartialContract.xml).
+
+![CorrectPurchaseReceipt](img/CorrectPurchaseReceipt.png)
 
 # Customize font and color for Grid
 
