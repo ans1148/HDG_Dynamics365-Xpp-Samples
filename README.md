@@ -71,3 +71,11 @@ There are multiple way to purchase receipt through X++.
 - You can find this method in [HDGPurchReceipt_PurchReceiptPartialHelper](./Purch_Receipt_MutipleWay/HDGPurchReceipt_PurchReceiptPartialHelper.xml)
 
 - Also, the test code is [HDGPurchReceipt_MainTest](./Purch_Receipt_MutipleWay/HDGPurchReceipt_MainTest.xml) (This class is simply an example of how to call a function. I hope you customize it according to your situation.)
+
+# Customize font and color for Grid
+
+The following example shows how you can change the way that the cells of a table control are colored.
+
+[Customize_Font_And_Color_For_Grid](./Customize_Font_And_Color_For_Grid)
+
+![CustomizeFontAndColorForGrid](img/CustomizeFontAndColorForGrid.png)
