@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDG_InventMovementJournalCreateHelper</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class HDG_InventMovementJournalCreateHelper extends HDG_InventJournalBase
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>run</Name>
+				<Source><![CDATA[
+    public void run()
+    {
+        if(!this.validate())
+        {
+            throw error("@SYS93835");
+        }
+
+        ttsbegin;
+
+        // Create journal table
+        InventJournalTable inventJournalTable = this.createJournalTable();
+
+        ListEnumerator enumerator = this.parmInventJournalLines().getEnumerator();
+        while (enumerator.moveNext())
+        {
+            HDG_TransMovJournalCreateContract lineRecord = enumerator.current();
+            
+            // Initialize journal trans
+            InventJournalTrans inventJournalTrans = this.initJournalTrans(inventJournalTable, lineRecord);
+
+            inventJournalTrans.insert();
+        }
+
+        // Post Inventory journal
+        if(this.parmPostEnabled())
+        {
+            this.postInventTableJournal(inventJournalTable);
+        }
+
+        ttscommit;
+
+        info("@SYS9265");
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createJournalTable</Name>
+				<Source><![CDATA[
+    InventJournalTable createJournalTable()
+    {
+        InventJournalTable inventJournalTable;
+        this.parmJournalId(NumberSeq::newGetNum(InventParameters::numRefInventJournalId()).num());
+
+        inventJournalTable.clear();
+        inventJournalTable.JournalId        = this.parmJournalId();
+        inventJournalTable.SystemBlocked    = true;
+
+        inventJournalTable.initFromInventJournalName(this.getDefaultJournalName());
+
+        inventJournalTable.insert();
+
+        return inventJournalTable;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>initJournalTrans</Name>
+				<Source><![CDATA[
+    InventJournalTrans initJournalTrans(InventJournalTable _inventJournalTable, HDG_TransMovJournalCreateContract _contract)
+    {
+        InventJournalTrans inventJournalTrans;
+        InventDim fromInventDim, toInventDim;
+
+        inventJournalTrans.clear();
+        inventJournalTrans.initFromInventJournalTable(_inventJournalTable);
+        inventJournalTrans.initFromInventTable(InventTable::find(_contract.ItemId()));
+        inventJournalTrans.TransDate    = _contract.TransDate();
+
+        inventJournalTrans.Qty          = _contract.Qty();
+        inventJournalTrans.modifyInventJournalTransUnitQty();
+
+        // Inventory dimension
+        InventSerial::findOrCreate(_contract.InventSerialId(), _contract.ItemId());
+        fromInventDim.InventSerialId    = _contract.InventSerialId();
+        InventBatch::findOrCreate(_contract.InventBatchId(), _contract.ItemId());
+        fromInventDim.InventBatchId     = _contract.InventBatchId();
+
+        fromInventDim.InventSiteId      = _contract.InventSiteId();
+        fromInventDim.InventLocationId  = _contract.InventLocationId();
+        fromInventDim.wMSLocationId     = _contract.WMSLocationId();
+        fromInventDim                   = InventDim::findOrCreate(fromInventDim);
+
+        inventJournalTrans.InventDimId      = fromInventDim.inventDimId;
+
+        inventJournalTrans.CostPrice    = _contract.CostPrice();
+
+        return inventJournalTrans;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getDefaultJournalName</Name>
+				<Source><![CDATA[
+    public InventJournalName getDefaultJournalName()
+    {
+        return InventJournalName::find(InventParameters::find().MovementJournalNameId);
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

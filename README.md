@@ -103,3 +103,17 @@ Linked in : [Linked In](https://www.linkedin.com/posts/donggyun-ha-9a3724233_dyn
 ![SecurityPolicySetting](img/SecurityPolicySetting.png)
 
 ![SecurityPolicyInquiry](img/SecurityPolicyInquiry.png)
+
+# Create inventory journal 
+
+This sample introduce how to create movement, transfer, reverse inventory journal through X++.
+
+Linked in : [Linked In](https://www.linkedin.com/posts/donggyun-ha-9a3724233_dynamics365-xpp-inventoryjournal-activity-7175478324331257858-lOCf?utm_source=share&utm_medium=member_desktop)
+
+[Datacontract sample](./InventoryJournal/Contract)
+
+[Helper sample](./InventoryJournal/Helper)
+
+[Test sample](./InventoryJournal/Test)
+
+![InventoryJournal](img/InventoryJournal.png)

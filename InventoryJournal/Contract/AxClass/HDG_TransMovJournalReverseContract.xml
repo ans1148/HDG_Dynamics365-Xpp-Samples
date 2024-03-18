@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDG_TransMovJournalReverseContract</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[DataContractAttribute]
+internal final class HDG_TransMovJournalReverseContract
+{
+    private LineNum lineNumber;
+    private JournalTransDate transDate;
+    private InventQtyJournal qty;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>LineNumber</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("LineNumber")]
+    public LineNum LineNumber(LineNum _lineNumber = lineNumber)
+    {
+        lineNumber = _lineNumber;
+        return lineNumber;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>TransDate</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("TransDate")]
+    public JournalTransDate TransDate(JournalTransDate _transDate = transDate)
+    {
+        transDate = _transDate;
+        return transDate;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>Qty</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("Qty")]
+    public InventQtyJournal Qty(InventQtyJournal _qty = qty)
+    {
+        qty = _qty;
+        return qty;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

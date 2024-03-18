@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDG_InventJournalBase</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+public abstract class HDG_InventJournalBase
+{
+    private boolean postEnabled;
+    private Num journalId;
+    private List inventJournalLines;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>parmInventJournalLines</Name>
+				<Source><![CDATA[
+    // Journal lines
+    public List parmInventJournalLines(List _list = inventJournalLines)
+    {
+        inventJournalLines = _list;
+        return inventJournalLines;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmPostEnabled</Name>
+				<Source><![CDATA[
+    // Post YN
+    public boolean parmPostEnabled(boolean _postEnabled = postEnabled)
+    {
+        postEnabled = _postEnabled;
+        return postEnabled;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmJournalId</Name>
+				<Source><![CDATA[
+    // After journal is created, you can find the created journal Id through this method
+    public Num parmJournalId(Num _journalId = journalId)
+    {
+        journalId = _journalId;
+        return journalId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>run</Name>
+				<Source><![CDATA[
+    public abstract void run()
+    {
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validate</Name>
+				<Source><![CDATA[
+    public boolean validate()
+    {
+        boolean ok = true;
+
+        if(!this.parmInventJournalLines().elements())
+        {
+            ok = checkFailed('There is no data.');
+        }
+
+        return ok;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getDefaultJournalName</Name>
+				<Source><![CDATA[
+    public abstract InventJournalName getDefaultJournalName()
+    {
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>postInventTableJournal</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Post inventory journal
+    /// </summary>
+    /// <param name = "_inventJournalTable">InventJournalTable</param>
+    void postInventTableJournal(InventJournalTable _inventJournalTable)
+    {
+        JournalCheckPost        journalCheckPost;
+
+        journalCheckPost = inventJournalCheckPost::newJournalCheckPost(JournalCheckPostType::Post ,_inventJournalTable);
+        journalCheckPost.parmThrowCheckFailed(true);
+        journalCheckPost.parmShowInfoResult(true);
+        journalCheckPost.run();
+
+        InventJournalTable updateInventJournalTable;
+        updateInventJournalTable = InventJournalTable::find(_inventJournalTable.JournalId, true);
+        updateInventJournalTable.SystemBlocked = false;
+        InventJournalTable::initTotal(updateInventJournalTable);
+        updateInventJournalTable.update();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

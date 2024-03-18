@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDG_TransMovJournalCreateContract</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[DataContractAttribute]
+internal final class HDG_TransMovJournalCreateContract
+{
+    private JournalTransDate transDate;
+    private ItemIdInventoried itemId;
+    private InventQtyJournal qty;
+    private ItemCostPrice costPrice;
+    private InventSerialId inventSerialId, toInventSerialId;
+    private InventBatchId inventBatchId, toInventBatchId;
+    private InventSiteId inventSiteId, toInventSiteId;
+    private InventLocationId inventLocationId, toInventLocationId;
+    private WMSLocationId wMSLocationId, toWMSLocationId;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>TransDate</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("TransDate")]
+    public JournalTransDate TransDate(JournalTransDate _transDate = transDate)
+    {
+        transDate = _transDate;
+        return transDate;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ItemId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("ItemId")]
+    public ItemIdInventoried ItemId(ItemIdInventoried _itemId = itemId)
+    {
+        itemId = _itemId;
+        return itemId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>CostPrice</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("CostPrice")]
+    public ItemCostPrice CostPrice(ItemCostPrice _costPrice = costPrice)
+    {
+        costPrice = _costPrice;
+        return costPrice;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>Qty</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("Qty")]
+    public InventQtyJournal Qty(InventQtyJournal _qty = qty)
+    {
+        qty = _qty;
+        return qty;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>InventSerialId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("InventSerialId")]
+    public InventSerialId InventSerialId(InventSerialId _inventSerialId = inventSerialId)
+    {
+        inventSerialId = _inventSerialId;
+        return inventSerialId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>InventBatchId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("InventBatchId")]
+    public InventBatchId InventBatchId(InventBatchId _inventBatchId = inventBatchId)
+    {
+        inventBatchId = _inventBatchId;
+        return inventBatchId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>InventSiteId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("InventSiteId")]
+    public InventSiteId InventSiteId(InventSiteId _inventSiteId = inventSiteId)
+    {
+        inventSiteId = _inventSiteId;
+        return inventSiteId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>InventLocationId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("InventLocationId")]
+    public InventLocationId InventLocationId(InventLocationId _inventLocationId = inventLocationId)
+    {
+        inventLocationId = _inventLocationId;
+        return inventLocationId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>WMSLocationId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("WMSLocationId")]
+    public WMSLocationId WMSLocationId(WMSLocationId _wMSLocationId = wMSLocationId)
+    {
+        wMSLocationId = _wMSLocationId;
+        return wMSLocationId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ToInventSerialId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("ToInventSerialId")]
+    public InventSerialId ToInventSerialId(InventSerialId _toInventSerialId = toInventSerialId)
+    {
+        toInventSerialId = _toInventSerialId;
+        return toInventSerialId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ToInventBatchId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("ToInventBatchId")]
+    public InventBatchId ToInventBatchId(InventBatchId _toInventBatchId = toInventBatchId)
+    {
+        toInventBatchId = _toInventBatchId;
+        return toInventBatchId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ToInventSiteId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("ToInventSiteId")]
+    public InventSiteId ToInventSiteId(InventSiteId _toInventSiteId = toInventSiteId)
+    {
+        toInventSiteId = _toInventSiteId;
+        return toInventSiteId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ToInventLocationId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("ToInventLocationId")]
+    public InventLocationId ToInventLocationId(InventLocationId _toInventLocationId = toInventLocationId)
+    {
+        toInventLocationId = _toInventLocationId;
+        return toInventLocationId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ToWMSLocationId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("ToWMSLocationId")]
+    public WMSLocationId ToWMSLocationId(WMSLocationId _toWMSLocationId = toWMSLocationId)
+    {
+        toWMSLocationId = _toWMSLocationId;
+        return toWMSLocationId;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

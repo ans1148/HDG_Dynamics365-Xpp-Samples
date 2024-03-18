@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDG_InventJournalTest</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class HDG_InventJournalTest
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args _args)
+    {
+        HDG_TransMovJournalCreateContract contract;
+        List inventTransLines = new List(Types::Class);
+
+        contract = new HDG_TransMovJournalCreateContract();
+
+        contract.TransDate(DateTimeUtil::getSystemDate(DateTimeUtil::getUserPreferredTimeZone()));
+        contract.ItemId('P0002');
+        contract.CostPrice(200);
+        contract.Qty(100);
+        contract.InventSiteId('1');
+        contract.InventLocationId('11');
+        contract.WMSLocationId('11');
+        contract.ToInventSiteId('1');
+        contract.ToInventLocationId('12');
+        contract.ToWMSLocationId('12');
+
+        inventTransLines.addEnd(contract);
+
+        contract = new HDG_TransMovJournalCreateContract();
+
+        contract.TransDate(DateTimeUtil::getSystemDate(DateTimeUtil::getUserPreferredTimeZone()));
+        contract.ItemId('P0002');
+        contract.CostPrice(200);
+        contract.Qty(100);
+        contract.InventSiteId('1');
+        contract.InventLocationId('11');
+        contract.WMSLocationId('11');
+        contract.ToInventSiteId('1');
+        contract.ToInventLocationId('12');
+        contract.ToWMSLocationId('12');
+
+        inventTransLines.addEnd(contract);
+
+        // Movement
+        HDG_InventMovementJournalCreateHelper inventJournalMovCreateHelper = new HDG_InventMovementJournalCreateHelper();
+
+        inventJournalMovCreateHelper.parmInventJournalLines(inventTransLines);
+        inventJournalMovCreateHelper.parmPostEnabled(false);
+        inventJournalMovCreateHelper.run();
+
+        // Transfer
+        HDG_InventTransferJournalCreateHelper inventJournalTransCreateHelper = new HDG_InventTransferJournalCreateHelper();
+
+        inventJournalTransCreateHelper.parmInventJournalLines(inventTransLines);
+        inventJournalTransCreateHelper.parmPostEnabled(false);
+        inventJournalTransCreateHelper.run();
+
+        // Reverse
+        HDG_TransMovJournalReverseHelper inventJournalReverseHelper = new HDG_TransMovJournalReverseHelper();
+
+        inventTransLines = new List(Types::Class);
+
+        HDG_TransMovJournalReverseContract reverseContract;
+
+        reverseContract = new HDG_TransMovJournalReverseContract();
+
+        reverseContract.TransDate(DateTimeUtil::getSystemDate(DateTimeUtil::getUserPreferredTimeZone()));
+        reverseContract.LineNumber(1);
+        reverseContract.Qty(50);
+
+        inventTransLines.addEnd(reverseContract);
+
+        inventJournalReverseHelper.parmInventJournalLines(inventTransLines);
+        inventJournalReverseHelper.parmPostEnabled(false);
+        inventJournalReverseHelper.parmReverseJournalId(inventJournalMovCreateHelper.parmJournalId());
+        inventJournalReverseHelper.run();
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
