@@ -98,11 +98,21 @@ public abstract class HDG_InventJournalBase
         journalCheckPost.parmThrowCheckFailed(true);
         journalCheckPost.parmShowInfoResult(true);
         journalCheckPost.run();
+    }
 
+]]></Source>
+			</Method>
+			<Method>
+				<Name>updateInventJournalTableInfo</Name>
+				<Source><![CDATA[
+    void updateInventJournalTableInfo(InventJournalTable _inventJournalTable)
+    {
         InventJournalTable updateInventJournalTable;
         updateInventJournalTable = InventJournalTable::find(_inventJournalTable.JournalId, true);
+
         updateInventJournalTable.SystemBlocked = false;
         InventJournalTable::initTotal(updateInventJournalTable);
+
         updateInventJournalTable.update();
     }
 

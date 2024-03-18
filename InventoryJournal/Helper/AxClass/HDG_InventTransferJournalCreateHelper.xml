@@ -40,6 +40,8 @@ internal final class HDG_InventTransferJournalCreateHelper extends HDG_InventJou
             this.postInventTableJournal(inventJournalTable);
         }
 
+        this.updateInventJournalTableInfo(inventJournalTable);
+
         ttscommit;
 
         info("@SYS9265");
