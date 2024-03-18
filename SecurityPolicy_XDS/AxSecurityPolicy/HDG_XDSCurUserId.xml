@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxSecurityPolicy xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDG_XDSCurUserId</Name>
+	<ConstrainedTable>Yes</ConstrainedTable>
+	<ContextString>HDG_XDS</ContextString>
+	<ContextType>RoleProperty</ContextType>
+	<Enabled>No</Enabled>
+	<Operation>AllOperations</Operation>
+	<PrimaryTable>SysUserInfo</PrimaryTable>
+	<Query>HDG_XDSCurUserId</Query>
+	<ConstrainedTables />
+</AxSecurityPolicy>

@@ -89,3 +89,17 @@ The following example shows how you can change the way that the cells of a table
 [Customize_Font_And_Color_For_Grid](./Customize_Font_And_Color_For_Grid)
 
 ![CustomizeFontAndColorForGrid](img/CustomizeFontAndColorForGrid.png)
+
+# XDS - Security policy
+
+This sample provides an overview of Extensible Data Security (XDS) policies in Finance and operations apps. 
+XDS allows developers to supplement role-based security by restricting access to table records based on security policies. 
+The query in the policy applies a filter and only records that satisfy the conditions of the filter will be accessible from the restricted tables.
+
+Linked in : [Linked In](https://www.linkedin.com/posts/donggyun-ha-9a3724233_dynamics365-dynamicsax-xds-activity-7174780556327485440-Yw7e?utm_source=share&utm_medium=member_desktop)
+
+[XDS sample code](./SecurityPolicy_XDS)
+
+![SecurityPolicySetting](img/SecurityPolicySetting.png)
+
+![SecurityPolicyInquiry](img/SecurityPolicyInquiry.png)

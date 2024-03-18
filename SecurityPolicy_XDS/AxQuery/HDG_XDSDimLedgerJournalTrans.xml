@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxQuery xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxQuerySimple">
+	<Name>HDG_XDSDimLedgerJournalTrans</Name>
+	<SourceCode>
+		<Methods>
+			<Method>
+				<Name>classDeclaration</Name>
+				<Source><![CDATA[
+[Query]
+public class HDG_XDSDimLedgerJournalTrans extends QueryRun
+{
+}
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<DataSources>
+		<AxQuerySimpleRootDataSource>
+			<Name>LedgerJournalTrans</Name>
+			<DynamicFields>Yes</DynamicFields>
+			<Table>LedgerJournalTrans</Table>
+			<DataSources>
+				<AxQuerySimpleEmbeddedDataSource>
+					<Name>DimensionAttributeLevelValueView</Name>
+					<DynamicFields>Yes</DynamicFields>
+					<Table>DimensionAttributeLevelValueView</Table>
+					<DataSources>
+						<AxQuerySimpleEmbeddedDataSource>
+							<Name>MyDepartments</Name>
+							<DynamicFields>Yes</DynamicFields>
+							<Table>MyDepartments</Table>
+							<DataSources />
+							<DerivedDataSources />
+							<Fields />
+							<Ranges />
+							<JoinMode>NoExistsJoin</JoinMode>
+							<Relations>
+								<AxQuerySimpleDataSourceRelation>
+									<Name>QueryDataSourceRelation1</Name>
+									<Field>EntityInstance</Field>
+									<JoinDataSource>DimensionAttributeLevelValueView</JoinDataSource>
+									<RelatedField>DepartmentRecId</RelatedField>
+								</AxQuerySimpleDataSourceRelation>
+							</Relations>
+						</AxQuerySimpleEmbeddedDataSource>
+					</DataSources>
+					<DerivedDataSources />
+					<Fields />
+					<Ranges>
+						<AxQuerySimpleDataSourceRange>
+							<Name>DimensionAttribute</Name>
+							<Field>DimensionAttribute</Field>
+							<Value>22565421196</Value>
+						</AxQuerySimpleDataSourceRange>
+					</Ranges>
+					<JoinMode>NoExistsJoin</JoinMode>
+					<Relations>
+						<AxQuerySimpleDataSourceRelation>
+							<Name>QueryDataSourceRelation1</Name>
+							<Field>LedgerDimension</Field>
+							<JoinDataSource>LedgerJournalTrans</JoinDataSource>
+							<RelatedField>ValueCombinationRecId</RelatedField>
+						</AxQuerySimpleDataSourceRelation>
+					</Relations>
+				</AxQuerySimpleEmbeddedDataSource>
+			</DataSources>
+			<DerivedDataSources />
+			<Fields />
+			<Ranges />
+			<GroupBy />
+			<Having />
+			<OrderBy />
+		</AxQuerySimpleRootDataSource>
+	</DataSources>
+</AxQuery>

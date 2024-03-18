@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxQuery xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns=""
+	i:type="AxQuerySimple">
+	<Name>HDG_XDSCurUserId</Name>
+	<SourceCode>
+		<Methods>
+			<Method>
+				<Name>classDeclaration</Name>
+				<Source><![CDATA[
+[Query]
+public class HDG_XDSCurUserId extends QueryRun
+{
+}
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+	<DataSources>
+		<AxQuerySimpleRootDataSource>
+			<Name>SysUserInfo</Name>
+			<DynamicFields>Yes</DynamicFields>
+			<Table>SysUserInfo</Table>
+			<DataSources />
+			<DerivedDataSources />
+			<Fields />
+			<Ranges>
+				<AxQuerySimpleDataSourceRange>
+					<Name>Id</Name>
+					<Field>Id</Field>
+					<Value>(currentUserId())</Value>
+				</AxQuerySimpleDataSourceRange>
+			</Ranges>
+			<GroupBy />
+			<Having />
+			<OrderBy />
+		</AxQuerySimpleRootDataSource>
+	</DataSources>
+</AxQuery>

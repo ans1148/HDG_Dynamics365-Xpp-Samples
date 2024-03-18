@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxSecurityPolicy xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDG_XDSCustGroup10</Name>
+	<ConstrainedTable>Yes</ConstrainedTable>
+	<ContextString>HDG_XDS</ContextString>
+	<ContextType>RoleProperty</ContextType>
+	<Enabled>No</Enabled>
+	<Operation>AllOperations</Operation>
+	<PrimaryTable>CustGroup</PrimaryTable>
+	<Query>HDG_XDSCustGroup10</Query>
+	<ConstrainedTables>
+		<AxSecurityPolicyConstrainedEntity xmlns=""
+			i:type="AxSecurityPolicyConstrainedExpression">
+			<Constrained>Yes</Constrained>
+			<Name>CustTable</Name>
+			<ConstrainedTables />
+			<Value>(CustTable.CustGroup == CustGroup.CustGroup)</Value>
+		</AxSecurityPolicyConstrainedEntity>
+	</ConstrainedTables>
+</AxSecurityPolicy>
