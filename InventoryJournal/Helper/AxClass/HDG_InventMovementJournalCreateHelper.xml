@@ -84,6 +84,8 @@ internal final class HDG_InventMovementJournalCreateHelper extends HDG_InventJou
         inventJournalTrans.TransDate    = _contract.TransDate();
 
         inventJournalTrans.Qty          = _contract.Qty();
+        inventJournalTrans.CostPrice    = _contract.CostPrice();
+
         inventJournalTrans.modifyInventJournalTransUnitQty();
 
         // Inventory dimension
@@ -98,8 +100,6 @@ internal final class HDG_InventMovementJournalCreateHelper extends HDG_InventJou
         fromInventDim                   = InventDim::findOrCreate(fromInventDim);
 
         inventJournalTrans.InventDimId      = fromInventDim.inventDimId;
-
-        inventJournalTrans.CostPrice    = _contract.CostPrice();
 
         return inventJournalTrans;
     }
