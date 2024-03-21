@@ -117,3 +117,13 @@ Linked in : [Linked In](https://www.linkedin.com/posts/donggyun-ha-9a3724233_dyn
 [Test sample](./InventoryJournal/Test)
 
 ![InventoryJournal](img/InventoryJournal.png)
+
+# Inquiry full BOM
+
+This sample introduce how to inquiry full BOM through X++.
+
+Linked in : [Linked In](https://www.linkedin.com/posts/donggyun-ha-9a3724233_dynamics365-ax-erp-activity-7176483933751054336-Z-sw?utm_source=share&utm_medium=member_desktop)
+
+[Sample](./InquiryFullBOM)
+
+![InquiryFullBOM](img/InquiryFullBOM.png)

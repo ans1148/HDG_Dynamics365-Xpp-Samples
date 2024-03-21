@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDG_BOMGetHelper</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class HDG_BOMGetHelper
+{
+    private ItemId topItemId;
+    private List bomList;
+
+    date    curDate = DateTimeUtil::getSystemDate(DateTimeUtil::getUserPreferredTimeZone());
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>paramTopItemId</Name>
+				<Source><![CDATA[
+    public ItemId paramTopItemId(ItemId _topItemId = topItemId)
+    {
+        topItemId = _topItemId;
+        return topItemId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>paramBomList</Name>
+				<Source><![CDATA[
+    public List paramBomList(List _bomList = bomList)
+    {
+        bomList = _bomList;
+        return bomList;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getFullBOM</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Run class
+    /// </summary>
+    /// <returns>BOM list</returns>
+    public List getFullBOM()
+    {
+        void insertToBomList(BOMId _lineBomId, ItemId _childItemId, int _level)
+        {
+            BOM         bomLine;
+            BOMVersion  childBOMVersion;
+            HDG_BOMGetDataContract dataContract;
+
+            while select bomLine
+                where bomLine.BOMId == _lineBomId
+                    && bomLine.FromDate <= curDate
+                    && (!bomLine.ToDate || bomLine.ToDate >= curDate)
+            {
+                dataContract = new HDG_BOMGetDataContract();
+
+                dataContract.BOMId(bomLine.BOMId);
+                dataContract.ParentItemId(_childItemId);
+                dataContract.ChildItemId(bomLine.ItemId);
+                dataContract.BOMQty(bomLine.BOMQty);
+                dataContract.BOMQtySerie(bomLine.BOMQtySerie);
+                dataContract.UnitId(bomLine.UnitId);
+                dataContract.Level(_level);
+
+                bomList.addEnd(dataContract);
+
+                if(this.checkHasChild(BOMLine.ItemId))
+                {
+                    childBOMVersion = this.getEffectiveBOMVersion(bomLine.ItemId);
+                    insertToBomList(childBOMVersion.BOMId, childBOMVersion.ItemId, _level + 1);
+                }
+            }
+        }
+
+        if(!this.paramTopItemId())
+        {
+            warning('Please insert item code that you want to get full BOM');
+        }
+
+        bomList = new List(Types::Class);
+
+        insertToBomList(this.getEffectiveBOMVersion(this.paramTopItemId()).BOMId, this.paramTopItemId(), 1);
+
+        return bomList;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getEffectiveBOMVersion</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Get effective BOM Version
+    /// </summary>
+    /// <param name = "_itemId">Item id</param>
+    /// <returns>BOM Version</returns>
+    protected BOMVersion getEffectiveBOMVersion(ItemId _itemId)
+    {
+        BOMVersion      bomVersion;
+        BOMTable        bomTable;
+
+        select firstonly bomVersion
+            where bomVersion.ItemId == _itemId
+                && bomVersion.Active == NoYes::Yes
+                && bomVersion.Approved == NoYes::Yes
+                && bomVersion.FromDate <= curDate
+                && (!BOMVersion.ToDate || bomVersion.ToDate >= curDate)
+            join bomTable where bomTable.BOMId == bomVersion.BOMId
+                && bomTable.Approved == NoYes::Yes;
+
+        return bomVersion;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>checkHasChild</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Check there is child BOM from Parent item
+    /// </summary>
+    /// <param name = "_itemId">Parent item id</param>
+    /// <returns>Is have child</returns>
+    protected boolean checkHasChild(ItemId _itemId)
+    {
+        boolean     hasChild;
+        BOMVersion  bomVersion;
+        BOM         bomLine;
+
+        bomVersion = this.getEffectiveBOMVersion(_itemId);
+
+        select firstonly count(RecId) from bomLine
+            where bomLine.BOMId == bomVersion.BOMId;
+
+        if(bomLine.RecId)
+        {
+            hasChild = true;
+        }
+
+        return hasChild;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

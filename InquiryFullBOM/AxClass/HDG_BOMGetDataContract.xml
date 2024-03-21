@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDG_BOMGetDataContract</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[DataContractAttribute]
+internal final class HDG_BOMGetDataContract
+{
+    private BOMId bomId;
+    private ItemIdProduction parentItemId;
+    private ItemIdInventoried childItemId;
+    private BOMQty bomQty;
+    private BOMQtySerie bomQtySerie;
+    private UnitOfMeasureSymbol unitId;
+    private int level;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>BOMId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("BOMId")]
+    public BOMId BOMId(BOMId _bomId = bomId)
+    {
+        bomId = _bomId;
+        return bomId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ParentItemId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("ParentItemId")]
+    public ItemIdProduction ParentItemId(ItemIdProduction _parentItemId = parentItemId)
+    {
+        parentItemId = _parentItemId;
+        return parentItemId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ChildItemId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("ChildItemId")]
+    public ItemIdInventoried ChildItemId(ItemIdInventoried _childItemId = childItemId)
+    {
+        childItemId = _childItemId;
+        return childItemId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>BOMQty</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("BOMQty")]
+    public BOMQty BOMQty(BOMQty _bomQty = bomQty)
+    {
+        bomQty = _bomQty;
+        return bomQty;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>BOMQtySerie</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("BOMQtySerie")]
+    public BOMQtySerie BOMQtySerie(BOMQtySerie _bomQtySerie = bomQtySerie)
+    {
+        bomQtySerie = _bomQtySerie;
+        return bomQtySerie;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>UnitId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("UnitId")]
+    public UnitOfMeasureSymbol UnitId(UnitOfMeasureSymbol _unitId = unitId)
+    {
+        unitId = _unitId;
+        return unitId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>Level</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("Level")]
+    public int Level(int _level = level)
+    {
+        level = _level;
+        return level;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
