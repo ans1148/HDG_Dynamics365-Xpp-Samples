@@ -127,3 +127,12 @@ Linked in : [Linked In](https://www.linkedin.com/posts/donggyun-ha-9a3724233_dyn
 [Sample](./InquiryFullBOM)
 
 ![InquiryFullBOM](img/InquiryFullBOM.png)
+
+# Transfer order shipment / recevied with pick and register
+
+This sample introduce how to operating transfer order  through X++.
+
+
+[Sample](./TransferOrderOperation)
+
+![Transfer order](img/TransferOrder.png)

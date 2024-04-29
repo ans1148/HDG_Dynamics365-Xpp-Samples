@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDG_TransferOrderOperationTest</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class HDG_TransferOrderOperationTest
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args _args)
+    {
+        /** Configure shipment data set - Start **/
+        HDG_TransferOrderOperationContract contractShipment = new HDG_TransferOrderOperationContract();
+
+        contractShipment.InventTransferId('000002');
+        contractShipment.TransDate('2024-04-01');
+
+        List lineListShipment = new List(Types::Class);
+
+        HDG_TransferOrderOperationLineContract lineContractShipment = new HDG_TransferOrderOperationLineContract();
+
+        lineContractShipment.LineNumber(1);
+        lineContractShipment.ItemId('L0100');
+        lineContractShipment.QtyTransfer(10);
+        lineContractShipment.InventSiteId('5');
+        lineContractShipment.InventLocationId('51');
+        lineContractShipment.WMSLocationId('001');
+
+        lineListShipment.addEnd(lineContractShipment);
+
+        contractShipment.TransferLines(lineListShipment);
+        /** Configure shipment data set - End **/
+
+        /** Shipment - Start **/
+        ttsbegin;
+
+        HDG_TransferOrderOperationHelper helperShipment = new HDG_TransferOrderOperationHelper();
+
+        helperShipment.parmHeader(contractShipment);
+        helperShipment.parmUpdateType(InventTransferUpdateType::Shipment);
+        helperShipment.validateHeader();
+        helperShipment.shipment();
+        /** Shipment - End **/
+
+        /** Configure received data set - Start **/
+        HDG_TransferOrderOperationContract contractReceived = new HDG_TransferOrderOperationContract();
+
+        contractReceived.InventTransferId('000002');
+        contractReceived.TransDate('2024-04-05');
+
+        List lineListReceived = new List(Types::Class);
+
+        HDG_TransferOrderOperationLineContract lineContractReceived = new HDG_TransferOrderOperationLineContract();
+
+        lineContractReceived.LineNumber(1);
+        lineContractReceived.ItemId('L0100');
+        lineContractReceived.QtyTransfer(10);
+        lineContractReceived.InventSiteId('6');
+        lineContractReceived.InventLocationId('61');
+        lineContractReceived.WMSLocationId('RECV');
+        lineContractReceived.LicensePlateId('61_RECV');
+
+        lineListReceived.addEnd(lineContractReceived);
+
+        contractReceived.TransferLines(lineListReceived);
+        /** Configure received data set - End **/
+
+        /** Receive - Start **/
+        HDG_TransferOrderOperationHelper helperReceived = new HDG_TransferOrderOperationHelper();
+
+        helperReceived.parmHeader(contractReceived);
+        helperReceived.parmUpdateType(InventTransferUpdateType::Receive);
+        helperReceived.validateHeader();
+        helperReceived.receive();
+
+        ttscommit;
+        /** Receive - End **/
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

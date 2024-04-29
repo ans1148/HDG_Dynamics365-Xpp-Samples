@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDG_TransferOrderOperationLineContract</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[DataContractAttribute]
+internal final class HDG_TransferOrderOperationLineContract
+{
+    private LineNum lineNum;
+    private ItemId itemId;
+    private InventTransferQty qtyTransfer;
+    private InventSerialId inventSerialId;
+    private InventBatchId inventBatchId;
+    private InventSiteId inventSiteId;
+    private InventLocationId inventLocationId;
+    private WMSLocationId wMSLocationId;
+    private WHSLicensePlateId licensePlateId;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>LineNumber</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("LineNumber")]
+    public LineNum LineNumber(LineNum _parm = lineNum)
+    {
+        lineNum = _parm;
+        return lineNum;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>ItemId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("ItemId")]
+    public ItemId ItemId(ItemId _parm = itemId)
+    {
+        itemId = _parm;
+        return itemId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>QtyTransfer</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("QtyTransfer")]
+    public InventTransferQty QtyTransfer(InventTransferQty _parm = qtyTransfer)
+    {
+        qtyTransfer = _parm;
+        return qtyTransfer;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>InventSerialId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("InventSerialId")]
+    public InventSerialId InventSerialId(InventSerialId _inventSerialId = inventSerialId)
+    {
+        inventSerialId = _inventSerialId;
+        return inventSerialId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>InventBatchId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("InventBatchId")]
+    public InventBatchId InventBatchId(InventBatchId _inventBatchId = inventBatchId)
+    {
+        inventBatchId = _inventBatchId;
+        return inventBatchId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>InventSiteId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("InventSiteId")]
+    public InventSiteId InventSiteId(InventSiteId _inventSiteId = inventSiteId)
+    {
+        inventSiteId = _inventSiteId;
+        return inventSiteId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>InventLocationId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("InventLocationId")]
+    public InventLocationId InventLocationId(InventLocationId _inventLocationId = inventLocationId)
+    {
+        inventLocationId = _inventLocationId;
+        return inventLocationId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>WMSLocationId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("WMSLocationId")]
+    public WMSLocationId WMSLocationId(WMSLocationId _wMSLocationId = wMSLocationId)
+    {
+        wMSLocationId = _wMSLocationId;
+        return wMSLocationId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>LicensePlateId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("LicensePlateId")]
+    public WHSLicensePlateId LicensePlateId(WHSLicensePlateId _licensePlateId = licensePlateId)
+    {
+        licensePlateId = _licensePlateId;
+        return licensePlateId;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

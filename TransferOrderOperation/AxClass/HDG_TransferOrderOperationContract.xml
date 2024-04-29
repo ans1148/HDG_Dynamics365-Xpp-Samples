@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDG_TransferOrderOperationContract</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+[DataContractAttribute]
+internal final class HDG_TransferOrderOperationContract
+{
+    private InventTransferId inventTransferId;
+    private str transDate;
+    private List transferLines;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>InventTransferId</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("TransferId")]
+    public InventTransferId InventTransferId(InventTransferId _parm = inventTransferId)
+    {
+        inventTransferId = _parm;
+        return inventTransferId;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>TransDate</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("TransDate")]
+    public str TransDate(str _parm = transDate)
+    {
+        transDate = _parm;
+        return transDate;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>TransferLines</Name>
+				<Source><![CDATA[
+    [DataMemberAttribute("TransferLines"),
+        DataCollectionAttribute(Types::Class, classStr(HDG_TransferOrderOperationLineContract)),
+        AifCollectionTypeAttribute('TransferLines', Types::Class, classStr(HDG_TransferOrderOperationLineContract)),
+        AifCollectionTypeAttribute('return', Types::Class, classStr(HDG_TransferOrderOperationLineContract))]
+    public List TransferLines(List _transferLines = transferLines)
+    {
+        transferLines = _transferLines;
+        return transferLines;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

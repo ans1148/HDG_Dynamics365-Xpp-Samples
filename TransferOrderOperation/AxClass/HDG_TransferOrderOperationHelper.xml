@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDG_TransferOrderOperationHelper</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class HDG_TransferOrderOperationHelper
+{
+    private HDG_TransferOrderOperationContract header;
+    private List line;
+    private InventTransferUpdateType updateType;
+
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>parmHeader</Name>
+				<Source><![CDATA[
+    public HDG_TransferOrderOperationContract parmHeader(HDG_TransferOrderOperationContract _header = header)
+    {
+        header = _header;
+        this.parmLine(header.TransferLines());
+        return header;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmLine</Name>
+				<Source><![CDATA[
+    public List parmLine(List _line = line)
+    {
+        line = _line;
+        return line;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>parmUpdateType</Name>
+				<Source><![CDATA[
+    public InventTransferUpdateType parmUpdateType(InventTransferUpdateType _updateType = updateType)
+    {
+        updateType = _updateType;
+        return updateType;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>validateHeader</Name>
+				<Source><![CDATA[
+    public void validateHeader()
+    {
+        InventTransferTable inventTransTable = InventTransferTable::find(header.InventTransferId());
+
+        if(!inventTransTable)
+        {
+            throw Error('Transfer id is not valid.');
+        }
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>shipment</Name>
+				<Source><![CDATA[
+    public void shipment()
+    {
+        InventTransferLine inventTransferLine;
+        InventDim inventDimLocal;
+        ListEnumerator enumerator = line.getEnumerator();
+
+        while (enumerator.moveNext())
+        {
+            HDG_TransferOrderOperationLineContract lineRecord = enumerator.current();
+
+            inventTransferLine = InventTransferLine::find(header.InventTransferId(), lineRecord.LineNumber());
+            
+            // Pick transfer order line
+            inventDimlocal.inventBatchId    = lineRecord.InventBatchId();
+            inventDimlocal.inventSerialId   = lineRecord.InventSerialId();
+            inventDimlocal.LicensePlateId   = lineRecord.LicensePlateId();
+            inventDimlocal.wMSLocationId    = lineRecord.WMSLocationId();
+            inventDimlocal.InventLocationId = lineRecord.InventLocationId();
+            inventDimlocal.InventSiteId     = lineRecord.InventSiteId();
+            inventDimlocal                  = InventDim::findOrCreate(inventDimlocal);
+
+            this.pick(inventTransferLine.InventTransId, lineRecord.QtyTransfer(), inventDimlocal);
+        }
+        
+        InventTransferMultiShip inventTransferMultiShip = InventTransferMultiShip::construct();
+        inventTransferMultiShip.runUpdate(this.createParmTable());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>receive</Name>
+				<Source><![CDATA[
+    public void receive()
+    {
+        InventTransferLine inventTransferLine;
+        InventDim inventDimLocal;
+        ListEnumerator enumerator = line.getEnumerator();
+
+        while (enumerator.moveNext())
+        {
+            HDG_TransferOrderOperationLineContract lineRecord = enumerator.current();
+
+            inventTransferLine = InventTransferLine::find(header.InventTransferId(), lineRecord.LineNumber());
+
+            // Register transfer order line
+            inventDimlocal.inventBatchId    = lineRecord.InventBatchId();
+            inventDimlocal.inventSerialId   = lineRecord.InventSerialId();
+            inventDimlocal.LicensePlateId   = lineRecord.LicensePlateId();
+            inventDimlocal.wMSLocationId    = lineRecord.WMSLocationId();
+            inventDimlocal.InventLocationId = lineRecord.InventLocationId();
+            inventDimlocal.InventSiteId     = lineRecord.InventSiteId();
+            inventDimlocal                  = InventDim::findOrCreate(inventDimlocal);
+
+            this.register(inventTransferLine.InventTransIdReceive, lineRecord.QtyTransfer(), inventDimlocal);
+        }
+        
+        InventTransferMultiReceive inventTransferMultiReceive = InventTransferMultiReceive::construct();
+        inventTransferMultiReceive.runUpdate(this.createParmTable());
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>pick</Name>
+				<Source><![CDATA[
+    protected void pick(InventTransIdShipment _inventTransId, real _qty, InventDim _inventDim)
+    {
+        InventTransWMS_Pick     inventTransWMS_pick;
+        TmpInventTransWMS       tmpInventTransWMS;
+        InventTrans             inventTranslocal;
+        InventDim               inventDimlocal;
+
+        Query inventTransQuery;
+        QueryBuildDataSource qbds;
+
+        inventTransQuery = new Query();
+        qbds = inventTransQuery.addDataSource(tableNum(InventTrans));
+        qbds.addRange(fieldNum(InventTrans, StatusIssue)).value(SysQuery::range(StatusIssue::Picked,StatusIssue::OnOrder));
+        qbds = qbds.addDataSource(tableNum(InventTransOrigin));
+        qbds.relations(true);
+        qbds.joinMode(JoinMode::InnerJoin);
+        qbds.addRange(fieldNum(InventTransOrigin, InventTransId)).value(_inventTransId);
+
+        inventTranslocal = InventTrans::findTransId(_inventTransId, true);
+
+        inventDimlocal   = inventTranslocal.inventDim();
+ 
+        inventDimlocal.inventBatchId    = _inventDim.inventBatchId;
+        inventDimlocal.inventSerialId   = _inventDim.inventSerialId;
+        inventDimlocal.LicensePlateId   = _inventDim.LicensePlateId;
+        inventDimlocal.wMSLocationId    = _inventDim.wMSLocationId;
+        inventDimlocal.InventLocationId = _inventDim.InventLocationId;
+        inventDimlocal.InventSiteId     = _inventDim.inventSiteId;
+        inventDimlocal                  = InventDim::findOrCreate(inventDimlocal);
+
+        inventTransWMS_pick             = InventTransWMS_Pick::newStandard(tmpInventTransWMS, inventTransQuery);
+    
+        tmpInventTransWMS.clear();
+        tmpInventTransWMS.initFromInventTrans(inventTranslocal);
+        tmpInventTransWMS.initFromInventTransOrigin(InventTransOrigin::findByInventTransId(_inventTransId));
+        tmpInventTransWMS.initFromInventDim(inventDimlocal);
+        tmpInventTransWMS.InventQty = _qty;
+
+        inventTransWMS_pick.writeTmpInventTransWMS(tmpInventTransWMS);
+       
+        inventTransWMS_pick.updateInvent();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>register</Name>
+				<Source><![CDATA[
+    protected void register(InventTransIdShipment _inventTransId, real _qty, InventDim _inventDim)
+    {
+        InventTransWMS_Register inventTransWMS_register;
+        TmpInventTransWMS       tmpInventTransWMS;
+        InventTrans             inventTranslocal;
+        InventDim               inventDimlocal;
+
+        inventTranslocal = InventTrans::findTransId(_inventTransId, true);
+
+        inventDimlocal   = inventTranslocal.inventDim();
+ 
+        inventDimlocal.inventBatchId    = _inventDim.inventBatchId;
+        inventDimlocal.inventSerialId   = _inventDim.inventSerialId;
+        inventDimlocal.LicensePlateId   = _inventDim.LicensePlateId;
+        inventDimlocal.wMSLocationId    = _inventDim.wMSLocationId;
+        inventDimlocal.InventLocationId = _inventDim.InventLocationId;
+        inventDimlocal.InventSiteId     = _inventDim.inventSiteId;
+        inventDimlocal                  = InventDim::findOrCreate(inventDimlocal);
+
+        inventTransWMS_register         = inventTransWMS_register::newStandard(tmpInventTransWMS);
+
+        inventTranslocal.inventDimId    = inventDimlocal.inventDimId;
+    
+        tmpInventTransWMS.clear();
+        tmpInventTransWMS.initFromInventTrans(inventTranslocal);
+        tmpInventTransWMS.ItemId    = inventTranslocal.ItemId;
+        tmpInventTransWMS.InventQty = _qty;
+        tmpInventTransWMS.insert();
+
+        inventTransWMS_register.writeTmpInventTransWMS(tmpInventTransWMS,
+                                                       inventTranslocal,
+                                                       inventDimlocal);
+       
+        inventTransWMS_register.updateInvent(inventTranslocal);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createParmTable</Name>
+				<Source><![CDATA[
+    protected InventTransferParmTable createParmTable()
+    {
+        InventTransferParmTable transferParmTable;
+
+        transferParmTable.initParmDefault();
+        transferParmTable.ParmId            = RunBaseMultiParm::getSysParmId();
+        transferParmTable.UpdateType        = updateType;
+        transferParmTable.TransferId        = header.InventTransferId();
+        transferParmTable.ShipUpdateQty     = InventTransferShipUpdateQty::PickedQty;
+        transferParmTable.ReceiveUpdateQty  = InventTransferReceiveUpdateQty::Registered;
+        transferParmTable.TransDate         = str2Date(header.TransDate(), 321);
+        transferParmTable.EditLines         = NoYes::Yes;
+        transferParmTable.insert(true);
+
+        return transferParmTable;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
