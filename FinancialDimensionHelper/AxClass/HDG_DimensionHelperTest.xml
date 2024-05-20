@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDG_DimensionHelperTest</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class HDG_DimensionHelperTest
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>main</Name>
+				<Source><![CDATA[
+    public static void main(Args _args)
+    {
+        ttsbegin;
+
+        str test1 = HDG_DimensionHelper::getDefaultDimensionDisplayValueByDimName(22565422497, 'Department');
+        container test2 = HDG_DimensionHelper::getDefaultDimensionContainerValueByDimName(22565422497, 'Department');
+
+        str test3 = HDG_DimensionHelper::getLedgerDimensionFullValue(22565428066);
+        container test4 = HDG_DimensionHelper::getLedgerDimensionContainerValueByDimName(22565428066, 'BusinessUnit');
+
+        container createTest1;
+        createTest1 += [['BusinessUnit', '001']];
+        createTest1 += [['CostCenter', '020']];
+        createTest1 += [['Customer', 'US-002']];
+        int64 test5 = HDG_DimensionHelper::createDefaultDimension(createTest1);
+
+        container createTest2;
+        createTest2 += [['MainAccount', '140200']];
+        createTest2 += [['BusinessUnit', '069']];
+        createTest2 += [['Department', '022']];
+        int64 test6 = HDG_DimensionHelper::createLedgerDimension(createTest2);
+
+        ttscommit;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>

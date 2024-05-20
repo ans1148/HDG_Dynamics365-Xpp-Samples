@@ -132,7 +132,12 @@ Linked in : [Linked In](https://www.linkedin.com/posts/donggyun-ha-9a3724233_dyn
 
 This sample introduce how to operating transfer order  through X++.
 
-
 [Sample](./TransferOrderOperation)
 
 ![Transfer order](img/TransferOrder.png)
+
+# Inquiry and Create helper class for Financial dimension
+
+This sample introduce how to Create or find value for Financial dimension through X++.
+
+[Financial dimension helper class](./FinancialDimensionHelper/AxClass)

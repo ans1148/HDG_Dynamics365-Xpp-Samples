@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AxClass xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+	<Name>HDG_DimensionHelper</Name>
+	<SourceCode>
+		<Declaration><![CDATA[
+internal final class HDG_DimensionHelper
+{
+}
+]]></Declaration>
+		<Methods>
+			<Method>
+				<Name>getDefaultDimensionDisplayValueByDimName</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Get display value of default dimension
+    /// </summary>
+    /// <param name = "_defaultDimension">default dimension</param>
+    /// <param name = "_dimName">Dimension name</param>
+    /// <returns>DimensionValue</returns>
+    public static DimensionValue getDefaultDimensionDisplayValueByDimName(RecId _defaultDimension, Name _dimName)
+    {
+        DimensionAttributeValueSetStorage dimStorage;
+        dimStorage = DimensionAttributeValueSetStorage::find(_defaultDimension);
+        return dimStorage.getDisplayValueByDimensionAttribute(DimensionAttribute::findByName(_dimName).RecId);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getDefaultDimensionSeperateValue</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Get all element of default dimension
+    /// </summary>
+    /// <param name = "_defaultDimension">Default dimension</param>
+    /// <returns>[Dimension Name, Display value, Name]</returns>
+    public static container getDefaultDimensionSeperateValue(RecId _defaultDimension)
+    {
+        DimensionAttribute          dimAttr;
+        DimensionAttributeValue     dimAttrValue;
+
+        DimensionAttributeValueSetStorage dimStorage;
+        dimStorage = DimensionAttributeValueSetStorage::find(_defaultDimension);
+
+        container resultContainer;
+        Common common;
+        DictTable dictTable;
+        str name, value;
+        int i;
+
+        for (i=1 ; i<= dimStorage.elements() ; i++)
+        {
+            select firstonly dimAttrValue
+                    where dimAttrValue.RecId == dimStorage.getValueByIndex(i)
+                join dimAttr
+                    where dimAttr.RecId == dimAttrValue.DimensionAttribute;
+
+            if (dimAttr && dimAttrValue)
+            {
+                dictTable = new DictTable(dimAttr.BackingEntityType);
+                common = dictTable.makeRecord();
+
+                if (common.TableId)
+                {
+                    select common where common.(dimAttr.KeyAttribute) == dimAttrValue.EntityInstance;
+                    name = common.(dimAttr.NameAttribute);
+                    value = common.(dimAttr.ValueAttribute);
+                }
+            }
+            resultContainer += [[dimAttr.Name, value, name]];
+        }
+
+        return resultContainer;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getDefaultDimensionContainerValueByDimName</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Get specified dimension value and name from Default dimension
+    /// </summary>
+    /// <param name = "_defaultDimension">Default dimension ID</param>
+    /// <param name = "_dimName">Dimension name</param>
+    /// <returns>[Display value, Name]</returns>
+    public static container getDefaultDimensionContainerValueByDimName(RecId _defaultDimension, Name _dimName)
+    {
+        int i;
+        str dimensionValueName, value, name;
+
+        container resultContainer;
+        container dimensionContainer = HDG_DimensionHelper::getDefaultDimensionSeperateValue(_defaultDimension);
+
+        for(i = 1; i <= conLen(dimensionContainer); i++)
+        {
+            [dimensionValueName, value, name] = conPeek(dimensionContainer, i);
+
+            if(dimensionValueName == _dimName)
+            {
+                resultContainer = [value, name];
+                break;
+            }
+        }
+
+        return resultContainer;
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getLedgerDimensionFullValue</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Return full display value of ledger dimension
+    /// </summary>
+    /// <param name = "_ledgerDimension">Ledger dimension ID</param>
+    /// <returns>Full display value</returns>
+    public static str getLedgerDimensionFullValue(RecId _ledgerDimension)
+    {
+        return LedgerDimensionFacade::getDisplayValueForLedgerDimension(_ledgerDimension);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>getLedgerDimensionContainerValueByDimName</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Return container value for specified dimension
+    /// </summary>
+    /// <param name = "_ledgerDimension">Ledger dimension ID</param>
+    /// <param name = "_dimName">Name</param>
+    /// <returns>[Display value, Name]</returns>
+    public static container getLedgerDimensionContainerValueByDimName(RecId _ledgerDimension, Name _dimName)
+    {
+        int64 defaultDimension = DimensionAttributeValueSetStorage::getDefaultDimensionFromDimensionCombination(_ledgerDimension);
+        return HDG_DimensionHelper::getDefaultDimensionContainerValueByDimName(defaultDimension, _dimName);
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createDefaultDimension</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Create default dimension
+    /// </summary>
+    /// <param name = "_dimensionCon">[[DimensionName, Value]]</param>
+    /// <returns>Default dimension ID</returns>
+    public static int64 createDefaultDimension(container _dimensionCon)
+    {
+        DimensionAttributeValueSetStorage   valueSetStorage;
+        int                     i;
+        DimensionAttribute      dimensionAttribute;
+        DimensionAttributeValue dimensionAttributeValue;
+        str dimensionName, value;
+
+        valueSetStorage = new DimensionAttributeValueSetStorage();
+
+        for(i = 1; i <= conLen(_dimensionCon) ; i++)
+        {
+            [dimensionName, value] = conPeek(_dimensionCon, i);
+
+            dimensionAttribute = dimensionAttribute::findByName(dimensionName);
+
+            if (!dimensionAttribute.RecId)
+            {
+                continue;
+            }
+
+            if (value)
+            {
+                dimensionAttributeValue = dimensionAttributeValue::findByDimensionAttributeAndValue(dimensionAttribute,value,false,true);
+                valueSetStorage.addItem(dimensionAttributeValue);
+            }
+        }
+
+        return valueSetStorage.save();
+    }
+
+]]></Source>
+			</Method>
+			<Method>
+				<Name>createLedgerDimension</Name>
+				<Source><![CDATA[
+    /// <summary>
+    /// Create ledger dimension
+    /// </summary>
+    /// <param name = "_dimensionCon">[[DimensionName, Value]]</param>
+    /// <returns>Ledger dimension ID</returns>
+    public static int64 createLedgerDimension(container _dimensionCon)
+    {
+        MainAccount                         mainAccount;
+        RefRecId                            accountStructure;
+        int                                 hierarchyCount, hierarchyIdx;
+        DimensionSetSegmentName             DimensionSet;
+        DimensionAttribute                  dimensionAttribute;
+        DimensionAttributeValue             dimensionAttributeValue;
+        DimensionStorage                    dimStorage;
+        LedgerAccountContract               LedgerAccountContract = new LedgerAccountContract();
+        DimensionAttributeValueContract     ValueContract;
+        List                                valueContracts = new List(Types::Class);
+        dimensionAttributeValueCombination  dimensionAttributeValueCombination;
+
+        str dimensionName, value;
+
+        [dimensionName, value] = conPeek(_dimensionCon, 1);
+
+        mainAccount         = MainAccount::findByMainAccountId(value);
+        accountStructure    = DimensionHierarchy::getAccountStructure(mainAccount.RecId,Ledger::current());
+        hierarchyCount      = DimensionHierarchy::getLevelCount(accountStructure);
+        DimensionSet        = DimensionHierarchyLevel::getDimensionHierarchyLevelNames(accountStructure);
+
+        hierarchyIdx        = 1;
+
+        while (hierarchyIdx <= hierarchyCount)
+        {
+            if(hierarchyIdx == 1)
+            {
+                hierarchyIdx++;
+                continue;
+            }
+
+            [dimensionName, value] = conPeek(_dimensionCon, hierarchyIdx);
+
+            dimensionAttribute = DimensionAttribute::findByName(dimensionName);
+
+            if(dimensionAttribute)
+            {
+                dimensionAttributeValue = DimensionAttributeValue::findByDimensionAttributeAndValue(dimensionAttribute, value);
+
+                if(dimensionAttributeValue)
+                {
+
+                    ValueContract = new DimensionAttributeValueContract();
+                    ValueContract.parmName(dimensionAttribute.Name) ;
+                    ValueContract.parmValue(dimensionAttributeValue.CachedDisplayValue);
+                    valueContracts.addEnd(ValueContract);
+                }
+            }
+
+            hierarchyIdx++;
+        }
+
+        LedgerAccountContract.parmMainAccount(mainAccount.MainAccountId);
+        LedgerAccountContract.parmValues(valueContracts);
+
+        dimStorage                          = DimensionServiceProvider::buildDimensionStorageForLedgerAccount(LedgerAccountContract);
+        dimensionAttributeValueCombination  = DimensionAttributeValueCombination::find(dimStorage.save());
+
+        return dimensionAttributeValueCombination.RecId;
+    }
+
+]]></Source>
+			</Method>
+		</Methods>
+	</SourceCode>
+</AxClass>
