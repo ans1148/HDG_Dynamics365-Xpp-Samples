@@ -141,3 +141,9 @@ This sample introduce how to operating transfer order  through X++.
 This sample introduce how to Create or find value for Financial dimension through X++.
 
 [Financial dimension helper class](./FinancialDimensionHelper/AxClass)
+
+# Upload image
+
+This sample introduce how to upload image file through X++.
+
+[Image upload form](./Image_Upload/AxForm)
